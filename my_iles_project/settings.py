@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'apps.users',
     'apps.weekly_logs',
     'apps.placements',
+    'apps.evaluation',
     'rest_framework'
 ]
 
@@ -80,8 +81,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'iles_db',
-        'USER': 'iles_user',
-        'PASSWORD': 'iles_user',
+        'USER': 'postgres',
+        'PASSWORD': 'Becky123',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
