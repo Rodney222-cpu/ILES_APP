@@ -23,3 +23,11 @@ workplace_supervisor = models.ForeignKey(
         limit_choices_to={'role': 'workplace'}
     )
 
+academic_supervisor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='academic_evaluations',
+        limit_choices_to={'role': 'academic'}
+    )
+
+        
