@@ -29,9 +29,20 @@ academic_supervisor = models.ForeignKey(
         related_name='academic_evaluations',
         limit_choices_to={'role': 'academic'}
     )
-
 internship = models.ForeignKey(
         'internship.InternshipPlacement',
         on_delete=models.CASCADE,
         related_name='evaluations'
     )
+
+
+weekly_logs = models.ManyToManyField(
+        'weeklylog.WeeklyLog',
+        related_name='evaluations',
+        blank=True
+    ) 
+attendance = models.PositiveIntegerField(default=0)
+punctuality = models.PositiveIntegerField(default=0)
+teamwork = models.PositiveIntegerField(default=0)
+communication = models.PositiveIntegerField(default=0)
+technical_skills = models.PositiveIntegerField(default=0)
