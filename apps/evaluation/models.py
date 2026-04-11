@@ -46,3 +46,6 @@ punctuality = models.PositiveIntegerField(default=0)
 teamwork = models.PositiveIntegerField(default=0)
 communication = models.PositiveIntegerField(default=0)
 technical_skills = models.PositiveIntegerField(default=0)
+
+workplace_comment = models.TextField(blank=True, null=True)
+academic_comment = models.TextField(blank=True, null=True)
