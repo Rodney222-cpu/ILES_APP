@@ -49,3 +49,5 @@ technical_skills = models.PositiveIntegerField(default=0)
 
 workplace_comment = models.TextField(blank=True, null=True)
 academic_comment = models.TextField(blank=True, null=True)
+
+log_score = models.FloatField(default=0)
