@@ -58,3 +58,9 @@ class Evaluation(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
 
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    def calculate_log_score(self):
+        logs = self.weekly_logs.all()
+        if not logs:
+            return 0
+        return sum(log.performance_score for log in logs) / logs.count()
