@@ -55,4 +55,6 @@ class Evaluation(models.Model):
     total_score = models.FloatField(editable=False, default=0)
     grade = models.CharField(max_length=2, blank=True)
 
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
 
+    created_at = models.DateTimeField(auto_now_add=True)
