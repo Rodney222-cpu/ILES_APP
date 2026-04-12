@@ -88,3 +88,5 @@ class Evaluation(models.Model):
     
     def save(self, *args, **kwargs):
         self.log_score = self.calculate_log_score()
+        
+        self.supervisor_score = self.calculate_supervisor_score()
