@@ -85,3 +85,6 @@ class Evaluation(models.Model):
         elif self.total_score >= 50:
             return 'D'
         return 'F'
+    
+    def save(self, *args, **kwargs):
+        self.log_score = self.calculate_log_score()
