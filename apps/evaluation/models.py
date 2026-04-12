@@ -94,3 +94,5 @@ class Evaluation(models.Model):
         self.total_score = self.calculate_total()
         
         self.grade = self.calculate_grade()
+        
+        super().save(*args, **kwargs)
