@@ -72,3 +72,5 @@ class Evaluation(models.Model):
             self.communication +
             self.technical_skills
         ) / 4
+    def calculate_total(self):
+        return (self.log_score + self.supervisor_score) / 2
