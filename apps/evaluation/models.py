@@ -31,7 +31,7 @@ class Evaluation(models.Model):
     )
 
     internship = models.ForeignKey(
-        'internship.InternshipPlacement',
+        'placement.InternshipPlacement',
         on_delete=models.CASCADE,
         related_name='evaluations'
     )
