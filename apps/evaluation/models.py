@@ -31,13 +31,13 @@ class Evaluation(models.Model):
     )
 
     internship = models.ForeignKey(
-        'placement.InternshipPlacement',
+        'placements.InternshipPlacement',
         on_delete=models.CASCADE,
         related_name='evaluations'
     )
 
     weekly_logs = models.ManyToManyField(
-        'weeklylog.WeeklyLog',
+        'weekly_logs.WeeklyLog',
         related_name='evaluations',
         blank=True
     )
