@@ -36,7 +36,7 @@ class Evaluation(models.Model):
         related_name='evaluations'
     )
 
-    weekly_logs = models.ManyToManyField(
+    weekly_logs = models.ForeignKey(
         'weekly_logs.WeeklyLog',
         related_name='evaluations',
         blank=True
