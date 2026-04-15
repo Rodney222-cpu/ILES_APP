@@ -7,6 +7,7 @@ class Evaluationcriteria(models.Model):
 
     def __str__(self):
         return self.name
+
 class Evaluation(models.Model):
     placement = models.ForeignKey(
         'placements.InternshipPlacement',
@@ -34,6 +35,8 @@ class Evaluationscore(models.Model):
         return f"{self.criteria.name}: {self.score}"        
 
     
+class Meta:
+    unique_together = ["placement", "evaluator"]   
 
 
 
