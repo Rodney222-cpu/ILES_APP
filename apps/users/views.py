@@ -8,3 +8,13 @@ class userViewSet (viewsets.ModelViewSet):
     querryset = User.objects.all
     serializer_class = UserSerializer
     permission_classes =[IsAuthenticated]
+    
+    def get_queryset(self):
+        
+        user = self.request.user
+
+        if user.role == 'admin':
+            
+            return User.objects.all()
+    
+        return User.objects.filter(id=user.id)
