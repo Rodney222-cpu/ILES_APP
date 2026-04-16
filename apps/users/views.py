@@ -18,3 +18,4 @@ class userViewSet (viewsets.ModelViewSet):
             return User.objects.all()
     
         return User.objects.filter(id=user.id)
+    
