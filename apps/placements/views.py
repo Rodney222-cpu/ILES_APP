@@ -13,3 +13,4 @@ class InternshipPlacementViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.is_staff:
             return InternshipPlacement.objects.all()
+        return InternshipPlacement.objects.filter(student = user)
