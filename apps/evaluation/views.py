@@ -12,6 +12,11 @@ def creat_evaluation(request):
         form = EvaluationForm()
     return render(request, 'create_evaluation.html',  {'form': form})
 
+def evaluation_list(request):
+    evaluations = Evaluation.objects.all()
+    return render(request, 'evaluation_list.html', {'evaluations': evaluation})
+
+
         
 
 
