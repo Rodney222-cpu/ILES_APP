@@ -2,10 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Evaluation
 from .forms import EvaluationForm
 
-def creat_evaluation(request):
-    if request.method == "POST"
+def create_evaluation(request):
+    if request.method == "POST":
         form = EvaluationForm(request.POST)
-        if form. is_valid():
+        if form.is_valid():
             form.save()
             return redirect('evaluation list')
     else:
@@ -14,7 +14,7 @@ def creat_evaluation(request):
 
 def evaluation_list(request):
     evaluations = Evaluation.objects.all()
-    return render(request, 'evaluation_list.html', {'evaluations': evaluation})
+    return render(request, 'evaluation_list.html', {'evaluations': evaluations})
 
 def update_evaluation(request, pk):
     evaluation = get_object_or_404(Evaluation, id=pk)
