@@ -16,17 +16,17 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'rest_framework',
+    
 
     'apps.users',
     'apps.weekly_logs',
     'apps.placements',
- HEAD
+ 
     'apps.evaluation',
 
-    'apps.evaluations',
-    'rest_framework'
-f36dc68 (updated project)
+    
+    'rest_framework',
+
 ]
 
 MIDDLEWARE = [
