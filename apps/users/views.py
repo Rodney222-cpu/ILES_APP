@@ -7,11 +7,13 @@ User = get_user_model()
 class UserViewSet (viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes =[IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
         
         user = self.request.user
+        if not user or not user.is_authenticated:
+            return User.objects.none()
 
         if user.role == 'admin':
             
