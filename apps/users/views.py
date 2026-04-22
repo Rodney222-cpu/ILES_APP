@@ -26,3 +26,8 @@ class UserViewSet (viewsets.ModelViewSet):
     
         return User.objects.filter(id=user.id)
     
+@api_view(['POST'])
+def login_view(request):
+    serializer = LoginSerializer(data=request.data)
+
+    
