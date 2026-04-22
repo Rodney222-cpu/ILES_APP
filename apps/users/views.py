@@ -12,8 +12,6 @@ class UserViewSet (viewsets.ModelViewSet):
     def get_queryset(self):
         
         user = self.request.user
-        if not user or not user.is_authenticated:
-            return User.objects.none()
 
         if user.role == 'admin':
             
