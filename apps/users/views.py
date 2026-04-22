@@ -33,3 +33,9 @@ def login_view(request):
     if serializer.is_valid():
         username = serializer.validated_data["username"]
         password = serializer.validated_data["password"]
+        
+        user = authenticate(username=username, password=password)
+
+        if user is not None:
+            refresh = RefreshToken.for_user(user)
+
