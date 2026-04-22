@@ -13,7 +13,7 @@ class UserViewSet (viewsets.ModelViewSet):
         
         user = self.request.user
 
-        if user.role == 'admin':
+        if user.is_staff or user.is_superuser:
             
             return User.objects.all()
     
