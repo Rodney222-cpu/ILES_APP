@@ -44,4 +44,8 @@ def login_view(request):
                 "role": user.role,
                 "username": user.username
             }) 
+        return Response({"error": "Invalid credentials"}, status=400)
+
+    return Response(serializer.errors, status=400)        
+            
 
