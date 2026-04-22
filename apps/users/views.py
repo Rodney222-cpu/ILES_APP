@@ -38,4 +38,10 @@ def login_view(request):
 
         if user is not None:
             refresh = RefreshToken.for_user(user)
+            
+            return Response({
+                "token": str(refresh.access_token),
+                "role": user.role,
+                "username": user.username
+            }) 
 
