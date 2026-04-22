@@ -12,4 +12,4 @@ db.sqlite3
 .env
 
 # VS Code
-.vscode/
+.vscode/*.pyc 
