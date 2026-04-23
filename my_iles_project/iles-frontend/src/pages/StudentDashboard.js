@@ -20,4 +20,7 @@ const StudentDashboard = () => {
                 <p>Name:</p>
             </div>
         </div>
+    );
+};
 
+export default StudentDashboard;
