@@ -13,7 +13,7 @@ class EvaluationViewSet(viewsets.ModelViewSet):
 
     """
 queryset = Evaluation.objects.all()
-
+serializer_class = EvaluationSerializer
 
 
         
