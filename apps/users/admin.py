@@ -4,4 +4,4 @@ from .models import CustomUser
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
-    # Register your models here.
+    list_display = ('username', 'staff_number', 'student_number')# Register your models here.
