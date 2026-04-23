@@ -1,4 +1,5 @@
 from django.contrib import admin
 from .models import Evaluation
 
-# Register your models here.
+@admin.register(Evaluation)
+class EvaluationAdmin(admin.ModelAdmin):# Register your models here.
