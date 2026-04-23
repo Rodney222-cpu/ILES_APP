@@ -1,4 +1,5 @@
 from django.contrib import admin
 from .models import placements
 
-# Register your models here.
+@admin.register(placements)
+class PlacementAdmin(admin.ModelAdmin):# Register your models here.
