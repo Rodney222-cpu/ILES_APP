@@ -12,6 +12,8 @@ const StudentDashboard = () => {
 
       <div style={styles.container}>
         <h2>Student Dashboard</h2>
+        <h3>Welcome </h3>
+        <p>Your internship progress overview</p>
 
         {/* Summary Cards */}
         <div style={styles.cards}>
