@@ -64,3 +64,10 @@ function Login() {
   );
 }
 export default Login;
+
+const styles = {
+  container: {
+    height: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    
