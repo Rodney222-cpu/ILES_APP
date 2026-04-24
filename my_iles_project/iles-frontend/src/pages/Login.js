@@ -80,3 +80,8 @@ const styles = {
     gap: "15px",
     padding: "30px",
     backgroundColor: "white",
+    borderRadius: "10px",
+    boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+    width: "300px",
+    textAlign: "center",
+  },
