@@ -5,10 +5,10 @@ const Navbar = () => {
       <h2 style={styles.logo}>ILES</h2>
 
       <div style={styles.links}>
-        <a href="#">Dashboard</a>
-        <a href="#">Submit Log</a>
+        <button>Dashboard</button>
+        <button>Submit Log</button>
         <button style={styles.btn}>Logout</button>
-      </div>
+        </div>
     </div>
   );
 };
