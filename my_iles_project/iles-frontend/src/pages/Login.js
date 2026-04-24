@@ -17,11 +17,11 @@ function Login() {
 
       const { token, role } = response.data;
 
-      // Save token & role
+    
       localStorage.setItem("token", token);
       localStorage.setItem("role", role);
 
-      // Redirect based on role
+    
       if (role === "student") {
         window.location.href = "/student-dashboard";
       } else if (role === "admin") {
