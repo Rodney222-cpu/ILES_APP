@@ -42,3 +42,10 @@ function Login() {
     <div style={styles.container}>
       <div style={styles.form}>
         <h2>Login</h2>
+
+               <input
+          style={styles.input}
+          type="text"
+          placeholder="Username"
+          onChange={(e) => setUsername(e.target.value)}
+        /> 
