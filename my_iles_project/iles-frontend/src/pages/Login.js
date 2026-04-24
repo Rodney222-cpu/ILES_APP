@@ -95,3 +95,6 @@ const styles = {
     backgroundColor: "#007bff",
     color: "white",
     border: "none",
+        cursor: "pointer",
+  },
+};
