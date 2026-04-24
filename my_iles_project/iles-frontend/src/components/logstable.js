@@ -48,11 +48,25 @@ const getStatusStyle = (status) => {
 };
 
 const styles = {
-  table: {
-    width: "100%",
-    marginTop: "20px",
-    borderCollapse: "collapse"
+    table: {
+        width: "100%",
+        borderCollapse: "collapse",
+        background: "white",
+        borderRadius: "10px",
+        overflow: "hidden"
+  },
+  th: {
+    background: "#1e3a8a",
+    color: "white",
+    padding: "10px",
+    textAlign: "left"
+  },
+  td: {
+    padding: "10px",
+    borderBottom: "1px solid #ddd"
   }
 };
+  
+  
 
 export default LogsTable;
