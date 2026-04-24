@@ -70,4 +70,7 @@ const styles = {
     height: "100vh",
     display: "flex",
     justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f4f4f4",
     
+  },
