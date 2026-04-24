@@ -74,3 +74,9 @@ const styles = {
     backgroundColor: "#f4f4f4",
     
   },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "15px",
+    padding: "30px",
+    backgroundColor: "white",
