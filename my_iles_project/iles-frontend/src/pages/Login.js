@@ -85,3 +85,7 @@ const styles = {
     width: "300px",
     textAlign: "center",
   },
+  input: {
+    padding: "10px",
+    fontSize: "16px",
+  },
