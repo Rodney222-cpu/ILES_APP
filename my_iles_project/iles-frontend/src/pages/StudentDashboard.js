@@ -32,7 +32,9 @@ const StudentDashboard = () => {
     setLoading(false);
     }
   };
-  
+  if (loading) {
+    return <h2 style={{ padding: "20px" }}>Loading dashboard...</h2>;
+  }
   
   const totalLogs = logs.length;
   const approvedLogs = logs.filter(log => log.status === "Approved").length;
