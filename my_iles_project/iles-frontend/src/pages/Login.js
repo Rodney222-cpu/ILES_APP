@@ -57,12 +57,22 @@ function Login() {
         /> 
 
                 <button style={styles.button} onClick={handleLogin}>
+
           Login
         </button>
-      </div>
+        <p 
+    onClick={() => window.location.href = "/register"} 
+    style={{ cursor: "pointer", color: "blue" }}
+  >
+    Don't have an account? Register
+  </p>
+</div>
     </div>
   );
 }
+      
+  
+
 export default Login;
 
 const styles = {
