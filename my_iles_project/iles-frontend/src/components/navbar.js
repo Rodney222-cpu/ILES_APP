@@ -2,19 +2,19 @@ import React from "react"
 import logo from "../assets/logo.png";
 const Navbar = () => {
   return (
-    
-    <div style={styles.logoContainer}>
-      <img src={logo} alt="ILES Logo" style={styles.logoImage} />
-      <h2 style={styles.logoText}>
-        ILES (Internship Login and Evaluation System)
-      </h2>
-    </div>
+    <div style={styles.navbar}>
+      <div style={styles.logoContainer}>
+        <img src={logo} alt="Logo" style={styles.logoImage} />
+        <h2 style={styles.logoText}>
+          ILES (Internship Login and Evaluation System)
+        </h2>
+      </div>
 
       <div style={styles.links}>
         <button>Dashboard</button>
         <button>Submit Log</button>
         <button style={styles.btn}>Logout</button>
-        </div>
+      </div>
     </div>
   );
 };
@@ -43,7 +43,7 @@ const styles = {
   logoImage: {
     width: "50px",
     height: "50px",
-    objectFit: "cover"
+    objectFit: "cover",
     boarderRadius: "50%"
   },
   logoText: {
