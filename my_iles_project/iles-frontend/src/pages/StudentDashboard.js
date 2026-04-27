@@ -22,16 +22,16 @@ const StudentDashboard = () => {
     }
   };
 
-const fetchLogs = async () => {
-  try {
-    const res = await axios.get("http://127.0.0.1:8000/api/logs/");
-    setLogs(res.data);
-  } catch (error) {
-    console.error("Error fetching logs:", error);
-  } finally {
+  const fetchLogs = async () => {
+    try {
+      const res = await axios.get("http://127.0.0.1:8000/api/logs/");
+      setLogs(res.data);
+    } catch (error) {
+      console.error("Error fetching logs:", error);
+    } finally {
     setLoading(false);
-  }
-};
+    }
+  };
   
   
   
