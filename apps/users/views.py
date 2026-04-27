@@ -48,4 +48,12 @@ def login_view(request):
 
     return Response(serializer.errors, status=400)        
             
+@api_view(['POST'])
+def register_view(request):
+    serializer = RegisterSerializer(data=request.data)
 
+    if serializer.is_valid():
+        serializer.save()
+        return Response({"message": "User registered successfully"})
+
+    return Response(serializer.errors, status=400)
