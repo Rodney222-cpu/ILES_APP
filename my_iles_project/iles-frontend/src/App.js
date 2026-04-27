@@ -1,11 +1,13 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
         <Route path="/student-dashboard" element={<h1>Student Dashboard</h1>} />
         <Route path="/admin-dashboard" element={<h1>Admin Dashboard</h1>} />
