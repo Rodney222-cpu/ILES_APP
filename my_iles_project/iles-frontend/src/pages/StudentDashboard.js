@@ -64,11 +64,15 @@ const StudentDashboard = () => {
 
 const styles = {
   container: {
-    padding: "20px"
+    padding: "20px",
+    backgroundColor: "#f9fafb",
+    minHeight: "100vh"
   },
   cards: {
     display: "flex",
-    gap: "15px"
+    gap: "15px",
+    marginTop: "20px",
+    marginBottom: "20px"
   }
 };
 
