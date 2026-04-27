@@ -3,7 +3,7 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 import SummaryCard from "../components/SummaryCard";
 import LogsTable from "../components/LogsTable";
-import logs from "../data/dummyLogs";
+
 
 const StudentDashboard = () => {
   const [student, setStudent] = useState(null);
@@ -43,3 +43,4 @@ const styles = {
 };
 
 export default StudentDashboard;
+ 
