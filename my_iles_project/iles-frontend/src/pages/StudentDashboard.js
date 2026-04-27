@@ -9,6 +9,32 @@ const StudentDashboard = () => {
   const [student, setStudent] = useState(null);
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    fetchStudentData();
+    fetchLogs();
+  }, []); 
+  const fetchStudentData = async () => {
+    try {
+      const res = await axios.get("http://127.0.0.1:8000/api/student/");
+      setStudent(res.data);
+    } catch (error) {
+      console.error("Error fetching student:", error);
+    }
+  };
+
+const fetchLogs = async () => {
+  try {
+    const res = await axios.get("http://127.0.0.1:8000/api/logs/");
+    setLogs(res.data);
+  } catch (error) {
+    console.error("Error fetching logs:", error);
+  } finally {
+    setLoading(false);
+  }
+};
+  
+  
+  
   return (
     <div>
       <Navbar />
