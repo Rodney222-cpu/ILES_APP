@@ -34,7 +34,9 @@ const StudentDashboard = () => {
   };
   
   
-  
+  const totalLogs = logs.length;
+  const approvedLogs = logs.filter(log => log.status === "Approved").length;
+  const pendingLogs = logs.filter(log => log.status === "Pending").length;
   return (
     <div>
       <Navbar />
