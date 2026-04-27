@@ -2,7 +2,7 @@ import React from "react"
 const Navbar = () => {
   return (
     <div style={styles.nav}>
-      <h2 style={styles.logo}>ILES</h2>
+      <h2 style={styles.logo}>ILES (Internship Login and Evaluation System)</h2>
 
       <div style={styles.links}>
         <button>Dashboard</button>
