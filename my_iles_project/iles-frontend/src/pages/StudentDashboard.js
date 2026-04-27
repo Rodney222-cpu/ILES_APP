@@ -50,9 +50,9 @@ const StudentDashboard = () => {
 
         {/* Summary Cards */}
         <div style={styles.cards}>
-          <SummaryCard title="Total Logs" value="12" color="#22c55e" />
-          <SummaryCard title="Pending Reviews" value="3" color="#f59e0b" />
-          <SummaryCard title="Approved Logs" value="7" color="#3b82f6" />
+          <SummaryCard title="Total Logs" value={totalLogs} color="#22c55e" />
+          <SummaryCard title="Pending Reviews" value={pendingLogs} color="#f59e0b" />
+          <SummaryCard title="Approved Logs" value={approvedLogs} color="#3b82f6" />
         </div>
 
         {/* Table */}
