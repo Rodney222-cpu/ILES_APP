@@ -9,6 +9,11 @@ const LogsTable = ({ logs }) => {
       <table style={styles.table}>
         <thead>
           <tr>
+            <th style={styles.cell}>Date</th>
+            <th style={styles.cell}>Description</th>
+            <th style={styles.cell}>Hours</th>
+            <th style={styles.cell}>Status</th>
+            <th style={styles.cell}>Supervisor Feedback</th>
             
           </tr>
         </thead>
