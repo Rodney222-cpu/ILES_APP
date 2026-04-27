@@ -55,18 +55,19 @@ const styles = {
     marginTop: "20px",
     marginBottom: "10px"
   },
-  cell: {
-    border: "1px solid #ddd",
-    padding: "10px",
-    textAlign: "left"
-  }
+  
   table: {
     width: "100%",
     borderCollapse: "collapse",
     marginTop: "10px",
     backgroundColor: "#fff",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.05)"
+    boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
     boarder: "1px solid #ddd"
+  },
+  cell: {
+    border: "1px solid #ddd",
+    padding: "10px",
+    textAlign: "left"
   },
   noData: {
     textAlign: "center",
