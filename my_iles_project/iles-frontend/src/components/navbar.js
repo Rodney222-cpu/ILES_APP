@@ -35,6 +35,20 @@ const styles = {
   logo: {
     margin: 0
   },
+  logoContainer: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px"
+  },
+  logoImage: {
+    width: "40px",
+    height: "40px",
+    objectFit: "cover"
+  },
+  logoText: {
+    fontSize: "18px",
+    fontWeight: "bold"
+  },
   btn: {
     padding: "6px 12px",
     background: "red",
