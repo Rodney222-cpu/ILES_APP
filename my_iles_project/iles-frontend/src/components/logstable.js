@@ -19,38 +19,31 @@ const LogsTable = ({ logs }) => {
         </thead>
 
         <tbody>
-          {logs.length > 0 ? (
-            logs.map((log) => (
-              <tr key={log.id}>
-                <td>{log.date}</td>
-                <td>{log.description}</td>
-                <td>{log.hours}</td>
+          {logs.map((log) => (
+            <tr key={log.id}>
+              <td style={styles.cell}>{log.date}</td>
+              <td style={styles.cell}>{log.description}</td>
+              <td style={styles.cell}>{log.hours}</td>
 
-                {/* Status with color */}
-                <td
-                  style={{
-                    color:
-                      log.status === "Approved"
-                        ? "green"
-                        : log.status === "Pending"
-                        ? "orange"
-                        : "red",
-                    fontWeight: "bold"
-                  }}
-                >
-                  {log.status}
-                </td>
+            <td
+              style={{
+                ...styles.cell,
+                color:
+                  log.status === "Approved"
+                    ? "green"
+                    : log.status === "Pending"
+                    ? "orange"
+                    : "red"
+              }}
+      >
+        {log.status}
+      </td>
 
-                <td>{log.supervisor_feedback || "No feedback yet"}</td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="5" style={styles.noData}>
-                No logs available
-              </td>
-            </tr>
-          )}
+      <td style={styles.cell}>
+        {log.supervisor_feedback || "No feedback yet"}
+      </td>
+    </tr>
+  ))}
         </tbody>
       </table>
     </div>
