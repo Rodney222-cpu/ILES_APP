@@ -37,6 +37,16 @@ MIDDLEWARE = [
 
 CROS_ALLOWED_ORIGINS = ["http://localhost:5173"]
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permission.IsAdminUser',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASS': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
+
 ROOT_URLCONF = 'my_iles_project.urls'
 
 TEMPLATES = [
