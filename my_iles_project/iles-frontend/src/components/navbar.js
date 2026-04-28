@@ -50,10 +50,7 @@ const styles = {
     fontSize: "18px",
     fontWeight: "bold"
   },
-  logoImage: {
-    transition: "0.3s",
-    cursor: "pointer"
-  },
+  
   btn: {
     padding: "6px 12px",
     background: "red",
