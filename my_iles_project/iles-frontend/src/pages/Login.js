@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 function Login() {
   const [username, setUsername] = useState("");
