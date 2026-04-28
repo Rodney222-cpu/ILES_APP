@@ -54,10 +54,13 @@ function Login() {
         <input
           style={styles.input}
           type={showPassword ? "text" : "password"}
-
           placeholder="Password"
           onChange={(e) => setPassword(e.target.value)}
         /> 
+          <button onClick={() => setShowPassword(!showPassword)}>
+  {showPassword ? "Hide Password" : "Show Password"}
+</button>
+
           {error && <p style={{ color: "red" }}>{error}</p>}
                 <button style={styles.button} onClick={handleLogin}>
                   
