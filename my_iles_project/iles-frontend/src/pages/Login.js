@@ -58,9 +58,12 @@ function Login() {
           placeholder="Password"
           onChange={(e) => setPassword(e.target.value)}
         /> 
-          <button onClick={() => setShowPassword(!showPassword)}>
-  {showPassword ? "Hide Password" : "Show Password"}
-</button>
+         <span
+    onClick={() => setShowPassword(!showPassword)}
+    style={{
+      position: "absolute",
+      right: "10px",
+      top: "50%",
 
           {error && <p style={{ color: "red" }}>{error}</p>}
                 <button style={styles.button} onClick={handleLogin}>
