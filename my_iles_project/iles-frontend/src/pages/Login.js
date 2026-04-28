@@ -34,7 +34,7 @@ function Login() {
       }
 
     } catch (error) {
-      alert("Invalid username or password");
+      setError("Invalid username or password");
     }
   };
 
