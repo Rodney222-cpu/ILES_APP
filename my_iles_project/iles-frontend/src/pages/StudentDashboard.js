@@ -65,7 +65,7 @@ const StudentDashboard = () => {
 const styles = {
   container: {
     padding: "20px",
-    backgroundColor: "#f9fafb",
+    backgroundColor: "#f1f5f9",
     minHeight: "100vh"
   },
   cards: {

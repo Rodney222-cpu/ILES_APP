@@ -60,7 +60,9 @@ const styles = {
     width: "100%",
     borderCollapse: "collapse",
     marginTop: "10px",
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffff",
+    boarderRadius: "8px",
+    overflow: "hidden",
     boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
     boarder: "1px solid #ddd"
   },
