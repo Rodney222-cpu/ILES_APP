@@ -56,8 +56,9 @@ function Login() {
           placeholder="Password"
           onChange={(e) => setPassword(e.target.value)}
         /> 
-
+          {error && <p style={{ color: "red" }}>{error}</p>}
                 <button style={styles.button} onClick={handleLogin}>
+                  
 
           Login
         </button>
