@@ -35,6 +35,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+CROS_ALLOWED_ORIGINS = ["http://localhost:5173"]
+
 ROOT_URLCONF = 'my_iles_project.urls'
 
 TEMPLATES = [
