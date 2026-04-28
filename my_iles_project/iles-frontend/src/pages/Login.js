@@ -64,6 +64,10 @@ function Login() {
       position: "absolute",
       right: "10px",
       top: "50%",
+           transform: "translateY(-50%)",
+      cursor: "pointer",
+    }}
+  ></span>
 
           {error && <p style={{ color: "red" }}>{error}</p>}
                 <button style={styles.button} onClick={handleLogin}>
