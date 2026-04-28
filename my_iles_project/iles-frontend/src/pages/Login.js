@@ -53,7 +53,8 @@ function Login() {
         />
         <input
           style={styles.input}
-          type="password"
+          type={showPassword ? "text" : "password"}
+
           placeholder="Password"
           onChange={(e) => setPassword(e.target.value)}
         /> 
