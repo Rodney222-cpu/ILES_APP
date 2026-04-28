@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import Evaluation
 
-# Register your models here.
+@admin.register(Evaluation)
+class EvaluationAdmin(admin.ModelAdmin):
+    list_display = ('placement', 'grade', 'created_at') # Register your models here.
