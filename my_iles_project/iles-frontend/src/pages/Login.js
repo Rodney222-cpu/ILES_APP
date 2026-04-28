@@ -20,11 +20,9 @@ function Login() {
 
       const { token, role } = response.data;
 
-    
       localStorage.setItem("token", token);
       localStorage.setItem("role", role);
 
-    
       if (role === "student") {
         window.location.href = "/student-dashboard";
       } else if (role === "admin") {
@@ -40,55 +38,61 @@ function Login() {
     }
   };
 
-
   return (
     <div style={styles.container}>
       <div style={styles.form}>
         <h2>Login</h2>
 
-               <input
+        <input
           style={styles.input}
           type="text"
           placeholder="Username"
           onChange={(e) => setUsername(e.target.value)}
         />
-        <input
-          style={styles.input}
-          type={showPassword ? "text" : "password"}
-          placeholder="Password"
-          onChange={(e) => setPassword(e.target.value)}
-        /> 
-         <span
-    onClick={() => setShowPassword(!showPassword)}
-    style={{
-      position: "absolute",
-      right: "10px",
-      top: "50%",
-           transform: "translateY(-50%)",
-      cursor: "pointer",
-    }}
-  ></span>
 
-          {error && <p style={{ color: "red" }}>{error}</p>}
-                <button style={styles.button} onClick={handleLogin}>
-                  
+        
+        <div style={{ position: "relative" }}>
+          <input
+            style={{ ...styles.input, paddingRight: "40px" }}
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            style={{
+              position: "absolute",
+              right: "10px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              cursor: "pointer",
+            }}
+          >
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </span>
+        </div>
+
+        
+        {error && <p style={{ color: "red" }}>{error}</p>}
+
+        <button style={styles.button} onClick={handleLogin}>
           Login
         </button>
-        <p 
-    onClick={() => window.location.href = "/register"} 
-    style={{ cursor: "pointer", color: "blue" }}
-  >
-    Don't have an account? Register
-  </p>
-</div>
+
+        <p
+          onClick={() => window.location.href = "/register"}
+          style={{ cursor: "pointer", color: "blue" }}
+        >
+          Don't have an account? Register
+        </p>
+      </div>
     </div>
   );
 }
-      
-  
 
 export default Login;
+
 
 const styles = {
   container: {
@@ -97,7 +101,6 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#f4f4f4",
-    
   },
   form: {
     display: "flex",
@@ -114,12 +117,11 @@ const styles = {
     padding: "10px",
     fontSize: "16px",
   },
-  
-   button: {
+  button: {
     padding: "10px",
     backgroundColor: "#007bff",
     color: "white",
     border: "none",
-        cursor: "pointer",
+    cursor: "pointer",
   },
 };
