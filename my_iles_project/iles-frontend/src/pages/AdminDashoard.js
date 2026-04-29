@@ -7,9 +7,10 @@ const AdminDashboard = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const fetchData = async () => {}
-          
-    }, []);
+        const fetchData = async () => {
+            try{}
+        }
+          , []);
 
     return(
         <div>
