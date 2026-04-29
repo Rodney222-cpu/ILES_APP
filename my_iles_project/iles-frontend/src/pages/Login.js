@@ -10,7 +10,7 @@ function Login() {
 
   const handleLogin = async () => { 
      if (!username || !password) {
-    setError("All fields are required");
+    setError("Please enter your username and password");
     return;
   }
     try {
