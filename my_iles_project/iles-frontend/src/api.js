@@ -9,4 +9,5 @@ api.interceptors.request.use((config) => {
     if (token) {
         config.headers.Authorization = `Token ${token}`;
     }
-})
+    return config;
+});
