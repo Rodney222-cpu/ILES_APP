@@ -60,6 +60,10 @@ function Register() {
 
         <button style={styles.button} onClick={handleRegister}>
           Register
+          if (password !== confirmPassword) {
+  alert("Passwords do not match");
+  return;
+}
         </button>
 
         <p onClick={() => window.location.href = "/"} style={{cursor: "pointer"}}>
