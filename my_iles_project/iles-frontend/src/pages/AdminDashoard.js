@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import api from './api';
 
 function Dashboard() {
     const [placements, setPlacements] = useState([]);
