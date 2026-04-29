@@ -12,7 +12,9 @@ const AdminDashboard = () => {
                 const response = await api.get('placements/');
                 setPlacements(response.data);
                 setLoading(false);
-            } catch (err) {}
+            } catch (err) {
+                setError('You are not authorized or the server is down');
+            }
         }
     }, []);
 
