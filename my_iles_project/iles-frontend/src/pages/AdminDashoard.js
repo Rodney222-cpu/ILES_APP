@@ -22,6 +22,7 @@ const AdminDashboard = () => {
     }, []);
 
     if (loading) return <p>Loading Dashboard...</p>;
+    if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
     return(
         <div>
