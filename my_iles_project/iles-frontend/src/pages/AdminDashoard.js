@@ -10,7 +10,7 @@ const AdminDashboard = () => {
         const fetchData = async () => {
             try {
                 const response = await api.get('placements/');
-
+                setPlacements(response.data);
             }
         }
     }, []);
