@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -22,9 +21,7 @@ function App() {
 
 
 export default App;
-=======
 
->>>>>>> 5338ada (edited code)
 
 import React from "react";
 import StudentDashboard from './pages/StudentDashboard';
