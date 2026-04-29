@@ -12,8 +12,8 @@ class EvaluationViewSet(viewsets.ModelViewSet):
     -delete (DELETE)
 
     """
-queryset = Evaluation.objects.all()
-serializer_class = EvaluationSerializer
+    queryset = Evaluation.objects.all()
+    serializer_class = EvaluationSerializer
 
 
         

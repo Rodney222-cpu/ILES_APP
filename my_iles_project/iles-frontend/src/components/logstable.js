@@ -68,7 +68,8 @@ const styles = {
   },
   cell: {
     border: "1px solid #ddd",
-    padding: "10px",
+    padding: "12px",
+    boarderBottom:"1px solid #e5e7eb",
     textAlign: "left"
   },
   noData: {
