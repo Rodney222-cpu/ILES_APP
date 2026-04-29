@@ -4,5 +4,7 @@ import axios from 'axios';
 function Dashboard() {
     const [placements, setPlacements] = useState([]);
 
-    useEffect(() => {})
+    useEffect(() => {
+        axios.get('http://127.0.0')
+    })
 } 
