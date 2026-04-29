@@ -6,10 +6,9 @@ const AdminDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-
     useEffect(() => {
-        axios.get('http://127.0.0')
-          .then(res => setPlacements(res.data));
+        const fetchData = async () => {}
+          
     }, []);
 
     return(
