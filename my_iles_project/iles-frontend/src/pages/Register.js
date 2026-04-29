@@ -8,6 +8,10 @@ function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleRegister = async () => {
+     if (password !== confirmPassword) {
+    alert("Passwords do not match");
+    return;
+  }
     try {
       await axios.post("http://127.0.0.1:8000/api/register/", {
         username,
@@ -60,10 +64,7 @@ function Register() {
 
         <button style={styles.button} onClick={handleRegister}>
           Register
-          if (password !== confirmPassword) {
-  alert("Passwords do not match");
-  return;
-}
+        
         </button>
 
         <p onClick={() => window.location.href = "/"} style={{cursor: "pointer"}}>
