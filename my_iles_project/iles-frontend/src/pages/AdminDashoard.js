@@ -21,6 +21,8 @@ const AdminDashboard = () => {
         fetchData();
     }, []);
 
+    if (loading) return <p>Loading Dashboard...</p>;
+
     return(
         <div>
             <h1>Admin Dashboard</h1>
