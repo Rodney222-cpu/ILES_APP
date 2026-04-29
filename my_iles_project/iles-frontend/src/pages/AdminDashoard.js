@@ -11,6 +11,7 @@ const AdminDashboard = () => {
             try {
                 const response = await api.get('placements/');
                 setPlacements(response.data);
+                setLoading(false);
             }
         }
     }, []);
