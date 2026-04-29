@@ -8,9 +8,12 @@ const AdminDashboard = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            try{}
+            try {
+                const response = await api.get('placements/');
+
+            }
         }
-          , []);
+    }, []);
 
     return(
         <div>
