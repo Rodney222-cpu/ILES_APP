@@ -6,7 +6,7 @@ from .serializers import InternshipPlacementserializer
 
 class InternshipPlacementViewSet(viewsets.ModelViewSet):
     queryset = InternshipPlacement.objects.all()
-    serializer_class = InternshipPlacementserializer
+    serializer_class = InternshipPlacementSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
