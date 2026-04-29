@@ -4,6 +4,8 @@ import api from './api';
 const AdminDashboard = () => {
     const [placements, setPlacements] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
 
     useEffect(() => {
         axios.get('http://127.0.0')
