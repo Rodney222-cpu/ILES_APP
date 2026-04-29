@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 from rest_framework import viewsets, permissions
 from .models import InternshipPlacement
-from .serializers import InternshipPlacementserializer
+from .serializers import InternshipPlacementSerializer
 
 class InternshipPlacementViewSet(viewsets.ModelViewSet):
     queryset = InternshipPlacement.objects.all()
