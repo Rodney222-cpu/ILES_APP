@@ -42,6 +42,12 @@ function Register() {
           placeholder="Password"
           onChange={(e) => setPassword(e.target.value)}
         />
+        <input
+  style={styles.input}
+  type="password"
+  placeholder="Confirm Password"
+  onChange={(e) => setConfirmPassword(e.target.value)}
+/>
 
         <select
           style={styles.input}
