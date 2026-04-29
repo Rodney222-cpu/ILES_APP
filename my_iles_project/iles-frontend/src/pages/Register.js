@@ -9,7 +9,7 @@ function Register() {
 
   const handleRegister = async () => {
       if (!username || !password || !confirmPassword) {
-           alert("Please enter your username and password");
+           alert("Please fill in all fields");
               return;
   }
 
