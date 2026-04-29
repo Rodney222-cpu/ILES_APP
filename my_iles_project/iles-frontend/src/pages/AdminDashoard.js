@@ -14,5 +14,5 @@ function Dashboard() {
             <h1>Admin Dashboard</h1>
             {placements.map(p => <p key={p.id}>{p.student_name} - {p.status}</p>)}
         </div>    
-    )
+    );
 } 
