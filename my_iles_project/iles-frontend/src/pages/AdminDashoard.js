@@ -14,6 +14,7 @@ const AdminDashboard = () => {
                 setLoading(false);
             } catch (err) {
                 setError('You are not authorized or the server is down');
+                setLoading(false);
             }
         }
     }, []);
