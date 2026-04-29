@@ -6,6 +6,7 @@ function Dashboard() {
 
     useEffect(() => {
         axios.get('http://127.0.0')
+          .then(res => setPlacements(res.data));
     }, []);
 
     return(
