@@ -12,7 +12,7 @@ const AdminDashboard = () => {
                 const response = await api.get('placements/');
                 setPlacements(response.data);
                 setLoading(false);
-            }
+            } catch (err) {}
         }
     }, []);
 
