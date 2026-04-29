@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from './api';
 
-function Dashboard() {
+const AdminDashboard = () => {
     const [placements, setPlacements] = useState([]);
 
     useEffect(() => {
