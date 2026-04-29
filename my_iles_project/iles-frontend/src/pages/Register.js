@@ -8,6 +8,10 @@ function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleRegister = async () => {
+      if (!username || !password || !confirmPassword) {
+
+
+
      if (password !== confirmPassword) {
     alert("Passwords do not match");
     return;
