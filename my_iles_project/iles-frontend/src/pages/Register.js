@@ -5,6 +5,7 @@ function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("student");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleRegister = async () => {
     try {
