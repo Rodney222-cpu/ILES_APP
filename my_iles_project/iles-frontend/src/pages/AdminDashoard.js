@@ -25,7 +25,7 @@ const AdminDashboard = () => {
     if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
     return(
-        <div>
+        <div style={{ padding: '20px'}}>
             <h1>Admin Dashboard</h1>
             {placements.map(p => <p key={p.id}>{p.student_name} - {p.status}</p>)}
         </div>    
