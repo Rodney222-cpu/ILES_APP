@@ -21,6 +21,17 @@ const AdminDashboard = () => {
         fetchData();
     }, []);
 
+    const handleDelete = async (id) => {
+        if (window.confirm("Are you sure you want to delete this?")) {
+            try {
+                await api.delete(`placements/${id}/`);
+                setPlacements(placements.filter(p => p.id !== id));
+            } catch (err) {
+                alert("Error deleting record.");
+            }
+        }
+    }        
+
     if (loading) return <p>Loading Dashboard...</p>;
     if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
@@ -47,6 +58,10 @@ const AdminDashboard = () => {
                         <td>
                             <button
                               onClick={() => handleDelete(p.id)}
+                              style={{ backgroundColor: 'red', color: 'white', cursor: 'pointer'}}
+                            >
+                                Delete
+                            </button>  
                         </td>
                      </tr>
                    ))}
