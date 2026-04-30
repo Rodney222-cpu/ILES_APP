@@ -24,6 +24,7 @@ admin.site.index_title = "Welcome to the Dashboard"
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('apps.placements.urls')),
+    path('api/auth/', include('dj_rest_auth.urls')),
 ]    
 
 from django.urls import path , include
