@@ -36,7 +36,8 @@ const AdminDashboard = () => {
                         <th>company_name</th>
                         <th>status</th>
                     </tr>
-                </thread>    
+                </thread> 
+                <tbody></tbody>   
             {placements.map(p => <p key={p.id}>{p.student_name} - {p.status}</p>)}
         </div>    
     );
