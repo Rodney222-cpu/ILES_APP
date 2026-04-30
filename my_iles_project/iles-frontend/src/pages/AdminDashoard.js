@@ -40,6 +40,7 @@ const AdminDashboard = () => {
                 <tbody>
                    {placements.map((p) => (
                      <th key={p.id}>
+                        <td>{p.student_name}</td>
                         <td>{p.company_name}</td>
                      </th>
                    ))}
