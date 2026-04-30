@@ -40,11 +40,12 @@ const AdminDashboard = () => {
                 </thread> 
                 <tbody>
                    {placements.map((p) => (
-                     <th key={p.id}>
+                     <tr key={p.id}>
                         <td>{p.student_name}</td>
                         <td>{p.company_name}</td>
                         <td>{p.status}</td>
-                     </th>
+                        <td></td>
+                     </tr>
                    ))}
                 </tbody>   
             </table>
