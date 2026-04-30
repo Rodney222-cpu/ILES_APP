@@ -42,6 +42,7 @@ const AdminDashboard = () => {
                      <th key={p.id}>
                         <td>{p.student_name}</td>
                         <td>{p.company_name}</td>
+                        <td>{p.status}</td>
                      </th>
                    ))}
                 </tbody>   
