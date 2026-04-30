@@ -44,7 +44,10 @@ const AdminDashboard = () => {
                         <td>{p.student_name}</td>
                         <td>{p.company_name}</td>
                         <td>{p.status}</td>
-                        <td></td>
+                        <td>
+                            <button
+                              onClick={() => handleDelete(p.id)}
+                        </td>
                      </tr>
                    ))}
                 </tbody>   
