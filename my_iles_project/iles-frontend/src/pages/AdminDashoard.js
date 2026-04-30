@@ -31,6 +31,7 @@ const AdminDashboard = () => {
             <h2>React Placements</h2>
             <table border="1" cellPadding="10">
                 <thread>
+                    <tr></tr>
             {placements.map(p => <p key={p.id}>{p.student_name} - {p.status}</p>)}
         </div>    
     );
