@@ -49,4 +49,6 @@ const AdminDashboard = () => {
             </table>
         </div>    
     );
-}; 
+};
+
+export default AdminDashboard;
