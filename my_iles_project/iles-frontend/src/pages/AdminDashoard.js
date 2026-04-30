@@ -35,6 +35,7 @@ const AdminDashboard = () => {
                         <th>student</th>
                         <th>company_name</th>
                         <th>status</th>
+                        <th>Action</th>
                     </tr>
                 </thread> 
                 <tbody>
