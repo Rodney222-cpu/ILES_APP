@@ -8,7 +8,11 @@ function Login() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = async () => {
+  const handleLogin = async () => { 
+     if (!username || !password) {
+    setError("Please enter your username and password");
+    return;
+  }
     try {
       const response = await axios.post(
         "http://127.0.0.1:8000/api/login/",
