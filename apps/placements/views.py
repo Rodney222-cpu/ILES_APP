@@ -2,11 +2,11 @@ from django.shortcuts import render
 
 from rest_framework import viewsets, permissions
 from .models import InternshipPlacement
-from .serializers import InternshipPlacementserializer
+from .serializers import InternshipPlacementSerializer
 
 class InternshipPlacementViewSet(viewsets.ModelViewSet):
     queryset = InternshipPlacement.objects.all()
-    serializer_class = InternshipPlacementserializer
+    serializer_class = InternshipPlacementSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):

@@ -39,9 +39,10 @@ CROS_ALLOWED_ORIGINS = ["http://localhost:5173"]
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permission.IsAdminUser',
+        'rest_framework.permissions.IsAdminUser',
     ],
     'DEFAULT_AUTHENTICATION_CLASS': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ],
@@ -71,7 +72,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'iles_db',
         'USER': 'postgres',
-        'PASSWORD': 'Becky123',
+        'PASSWORD': 'gift@20maK',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }

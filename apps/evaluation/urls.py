@@ -1,9 +1,7 @@
-from django.urls import path
-from . import views
+from rest_framework.routers import DefaultRouter
+from .views import EvaluationViewSet
 
-urlpatterns = [
-    path('', views.evaluation_list, name='evaluation_list'),
-    path('create/', views.create_evaluation, name='create_evaluation'),
-    path('update/<int:pk>/', views.update_evaluation, name = 'update_evaluation'),
-    path('delete/<int:pk>/', views.delete_evaluation, name = 'delete_evaluation'),
-]
+router = DefaultRouter()
+router.register(r'', EvaluationViewSet)
+
+urlpatterns = router.urls
