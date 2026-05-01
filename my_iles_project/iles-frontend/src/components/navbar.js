@@ -10,10 +10,10 @@ const Navbar = () => {
         </h2>
       </div>
 
-      <div style={styles.links}>
+      <div className="nav-buttons">
         <button>Dashboard</button>
         <button>Submit Log</button>
-        <button style={styles.btn}>Logout</button>
+        <button className="logout">Logout</button>
       </div>
     </div>
   );
