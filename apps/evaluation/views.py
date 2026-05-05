@@ -1,6 +1,10 @@
 from rest_framework import viewsets
 from .models import Evaluation
-from .serializers import EvaluationSerializer    
+from .serializers import EvaluationSerializer
+from django.http import HttpResponse
+
+def home(request):
+    return HttpResponse("Welcome to ILES system 🚀")    
             
 class EvaluationViewSet(viewsets.ModelViewSet):
     """
