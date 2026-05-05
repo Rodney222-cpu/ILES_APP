@@ -3,8 +3,7 @@ from .models import Evaluation
 from .serializers import EvaluationSerializer
 from django.http import HttpResponse
 
-def home(request):
-    return HttpResponse("Welcome to ILES system 🚀")    
+    
             
 class EvaluationViewSet(viewsets.ModelViewSet):
     """
@@ -19,6 +18,8 @@ class EvaluationViewSet(viewsets.ModelViewSet):
     queryset = Evaluation.objects.all()
     serializer_class = EvaluationSerializer
 
+def home(request):
+    return HttpResponse("Welcome to ILES system 🚀")
 
         
 
