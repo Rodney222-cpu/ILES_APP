@@ -5,8 +5,20 @@ function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("student");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleRegister = async () => {
+      if (!username || !password || !confirmPassword) {
+           alert("Please fill in all fields");
+              return;
+  }
+
+
+
+     if (password !== confirmPassword) {
+    alert("Passwords do not match");
+    return;
+  }
     try {
       await axios.post("http://127.0.0.1:8000/api/register/", {
         username,
@@ -41,6 +53,12 @@ function Register() {
           placeholder="Password"
           onChange={(e) => setPassword(e.target.value)}
         />
+        <input
+  style={styles.input}
+  type="password"
+  placeholder="Confirm Password"
+  onChange={(e) => setConfirmPassword(e.target.value)}
+/>
 
         <select
           style={styles.input}
@@ -53,6 +71,7 @@ function Register() {
 
         <button style={styles.button} onClick={handleRegister}>
           Register
+        
         </button>
 
         <p onClick={() => window.location.href = "/"} style={{cursor: "pointer"}}>
