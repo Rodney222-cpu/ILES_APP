@@ -4,15 +4,27 @@ import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 function Login() {
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => { 
-     if (!username || !password) {
+    const handleLogin = () => {
+   if (role === "student") {
+      navigate("/student-dashboard");
+   } else if (role === "admin") {
+      navigate("/admin-dashboard");
+   } else if (role === "workplace") {
+      navigate("/workplace-dashboard");
+   } else if (role === "academic") {
+      navigate("/academic-dashboard");
+   }
+};
+  if (!username || !password) {
     setError("Please enter your username and password");
-    return;
+  return;
   }
     try {
       const response = await axios.post(
