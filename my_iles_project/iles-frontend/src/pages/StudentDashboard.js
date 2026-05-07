@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "../components/navbar";
-import SummaryCard from "../components/SummaryCard";
+import SummaryCard from "../components/summaryCard";
 import LogsTable from "../components/LogTable";
 
 
