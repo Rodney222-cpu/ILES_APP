@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "../components/navbar";
 import SummaryCard from "../components/summarycard";
-import LogsTable from "../components/logTable";
+import LogsTable from "../components/logtable";
 
 
 const StudentDashboard = () => {
