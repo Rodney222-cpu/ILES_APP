@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'apps.users',
     'apps.placements',
     'apps.evaluations',
+    'apps.notifications',
     'rest_framework',
     'corsheaders'
 ]

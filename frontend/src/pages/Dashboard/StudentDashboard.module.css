@@ -1,0 +1,338 @@
+.page {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 24px 20px 36px;
+}
+
+.headerBlock {
+  border-bottom: 1px solid #e7eaef;
+  margin-bottom: 16px;
+}
+
+.title {
+  text-align: center;
+  margin: 0;
+  color: #1f2937;
+}
+
+.subtitle {
+  text-align: center;
+  color: #4b5563;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 18px 0 22px;
+}
+
+.card {
+  color: #fff;
+  border-radius: 8px;
+  padding: 14px 16px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.green { background: #2fae66; }
+.yellow { background: #e2a91e; }
+.blue { background: #2e6aac; }
+
+.cardValue {
+  font-size: 34px;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1;
+}
+
+.cardLabel {
+  margin: 4px 0 0;
+  font-size: 13px;
+}
+
+.formSection {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.sectionHint {
+  margin-top: 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.error {
+  color: #b91c1c;
+  margin: 6px 0;
+}
+
+.success {
+  color: #15803d;
+  margin: 6px 0;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.formGrid input,
+.formGrid textarea,
+.formGrid button {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 9px 11px;
+  font-size: 14px;
+}
+
+.formGrid textarea {
+  min-height: 90px;
+}
+
+.submitBtn {
+  grid-column: span 2;
+  background: #1d4f91;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.submitBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.tableTitle {
+  margin-bottom: 10px;
+}
+
+.tableWrap {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  border-bottom: 1px solid #eef1f4;
+  padding: 10px;
+  font-size: 14px;
+}
+
+.table th {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.statusBadge {
+  display: inline-block;
+  border-radius: 5px;
+  padding: 3px 8px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.approved { background: #2fae66; }
+.reviewed { background: #2e6aac; }
+.pending { background: #d19116; }
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.pageButtons {
+  display: flex;
+  gap: 6px;
+}
+
+.pageButtons button {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  border-radius: 6px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.pageButtons button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.activePage {
+  background: #1d4f91 !important;
+  color: #fff;
+  border-color: #1d4f91 !important;
+}
+
+.empty {
+  color: #6b7280;
+}
+
+@media (max-width: 900px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .submitBtn {
+    grid-column: span 1;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+}
+
+/* Placement Card Styles */
+.placementCard {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.placementCard h3 {
+  margin: 0 0 1rem 0;
+  color: #1a202c;
+}
+
+.placementInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.placementRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.placementLabel {
+  font-weight: 600;
+  color: #4a5568;
+  min-width: 180px;
+}
+
+.placementValue {
+  color: #2d3748;
+}
+
+.pending_approval {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.approved {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.active {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.warningCard {
+  background: #fffbeb;
+  border: 2px solid #fbbf24;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.warningCard h3 {
+  color: #92400e;
+  margin: 0 0 0.5rem 0;
+}
+
+.warningCard p {
+  color: #78350f;
+  margin: 0;
+}
+
+.errorCard {
+  background: #fef2f2;
+  border: 2px solid #ef4444;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.errorCard h3 {
+  color: #991b1b;
+  margin: 0 0 0.5rem 0;
+}
+
+.errorCard p {
+  color: #7f1d1d;
+  margin: 0.5rem 0;
+}
+
+/* Warning and Error Boxes for Log Form */
+.warningBox {
+  background: #fffbeb;
+  border-left: 4px solid #fbbf24;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.warningBox p {
+  margin: 0.25rem 0;
+  color: #92400e;
+  font-size: 14px;
+}
+
+.errorBox {
+  background: #fef2f2;
+  border-left: 4px solid #ef4444;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.errorBox p {
+  margin: 0.25rem 0;
+  color: #991b1b;
+  font-size: 14px;
+}
+
+/* Disabled form inputs */
+.formGrid input:disabled,
+.formGrid textarea:disabled {
+  background: #f3f4f6;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
