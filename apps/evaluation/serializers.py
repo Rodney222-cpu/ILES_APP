@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Evaluation 
 
-class EvaluationSerializer(serializers.ModelSerializers):
+class EvaluationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Evaluation 
         fields = '_ all_'

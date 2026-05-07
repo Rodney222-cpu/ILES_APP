@@ -1,0 +1,13 @@
+.dashboard {
+  padding: 20px;
+  background-color: #e8f5e9;
+  font-family: Arial, sans-serif;
+}
+
+.cards {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+    gap: "20px",
+    marginBottom: "20px"
+ 
+}
