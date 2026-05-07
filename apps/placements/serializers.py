@@ -3,7 +3,7 @@ from .models import InternshipPlacement
 
 
 
-class InternshipPlacementserializer(serializers.ModelSerializer):
+class InternshipPlacementSerializer(serializers.ModelSerializer):
 
     student_name = serializers.ReadOnlyField(source = 'student.get_full_name')
     workplace_supervisor_name = serializers.ReadOnlyField(source = 'workplace_supervisor.get_full_name')
