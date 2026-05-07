@@ -1,0 +1,38 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Local environment / Secrets
+.env
+*.env
+.env.local
+
+# SQLite (if you still have old local files)
+*.sqlite3
+
+# PostgreSQL specific
+*.sql.gz
+*.dump
+*.backup
+*.bak
+backups/
+dumps/
+pg_log/
+postgresql.log
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Static and Media (optional based on workflow)
+staticfiles/
+media/*
+
+# IDE settings
+.vscode/
+.idea/
+
+migrations/

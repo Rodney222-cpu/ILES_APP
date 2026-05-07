@@ -1,0 +1,38 @@
+/* src/pages/Home/Home.module.css */
+
+.home {
+  text-align: center;
+  padding: 2rem;
+  min-height: calc(100vh - 80px);
+  background-color: #f5f5f5;
+}
+
+/* Main heading */
+.home h1 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+/* Paragraph text */
+.home p {
+  font-size: 1rem;
+  color: #555;
+}
+
+/* Login/Register links container */
+.links {
+  margin-top: 1rem;
+  font-size: 1rem;
+}
+
+/* Links styling */
+.links a {
+  color: #007bff;
+  text-decoration: none;
+  margin: 0 0.5rem;
+  transition: opacity 0.2s ease;
+}
+
+.links a:hover {
+  opacity: 0.7;
+}
