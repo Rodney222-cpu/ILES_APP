@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
-import { getPendingPlacements, approvePlacement, rejectPlacement, assignSupervisor, getSupervisors } from '../../services/api';
+import { getPendingPlacements, approvePlacement, rejectPlacement, assignSupervisor, getSupervisors, getPlacement } from '../../services/api';
 import styles from './AdminDashboard.module.css';
 
 function AdminDashboard() {
-  const [placements, setPlacements] = useState([]);
+  const [pendingPlacements, setPendingPlacements] = useState([]);
+  const [approvedPlacements, setApprovedPlacements] = useState([]);
   const [supervisors, setSupervisors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPlacement, setSelectedPlacement] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState(''); // 'approve', 'reject', 'assign'
+  const [modalType, setModalType] = useState(''); // 'approve', 'reject', 'assign', 'view'
   const [adminComment, setAdminComment] = useState('');
   const [selectedSupervisor, setSelectedSupervisor] = useState('');
   const [message, setMessage] = useState('');
@@ -16,8 +17,14 @@ function AdminDashboard() {
 
   const fetchPlacements = async () => {
     try {
-      const response = await getPendingPlacements();
-      setPlacements(response.data || []);
+      // Fetch pending placements
+      const pendingResponse = await getPendingPlacements();
+      setPendingPlacements(pendingResponse.data || []);
+      
+      // Fetch all placements to get approved ones
+      const allResponse = await getPlacement();
+      const approved = (allResponse.data || []).filter(p => p.status === 'approved');
+      setApprovedPlacements(approved);
     } catch (err) {
       setError('Failed to load placements');
     } finally {
@@ -111,17 +118,22 @@ function AdminDashboard() {
 
       <div className={styles.statsCards}>
         <div className={styles.statCard}>
-          <div className={styles.statValue}>{placements.length}</div>
+          <div className={styles.statValue}>{pendingPlacements.length}</div>
           <div className={styles.statLabel}>Pending Approvals</div>
+        </div>
+        <div className={styles.statCard}>
+          <div className={styles.statValue}>{approvedPlacements.length}</div>
+          <div className={styles.statLabel}>Awaiting Supervisor Assignment</div>
         </div>
       </div>
 
       {message && <div className={styles.successAlert}>{message}</div>}
       {error && <div className={styles.errorAlert}>{error}</div>}
 
+      {/* Pending Placements Table */}
       <div className={styles.tableContainer}>
         <h3>Pending Placement Requests</h3>
-        {placements.length === 0 ? (
+        {pendingPlacements.length === 0 ? (
           <p className={styles.emptyState}>No pending placements</p>
         ) : (
           <table className={styles.table}>
@@ -136,7 +148,7 @@ function AdminDashboard() {
               </tr>
             </thead>
             <tbody>
-              {placements.map((placement) => (
+              {pendingPlacements.map((placement) => (
                 <tr key={placement.id}>
                   <td>
                     <div className={styles.studentInfo}>
@@ -174,6 +186,66 @@ function AdminDashboard() {
                         onClick={() => openModal(placement, 'reject')}
                       >
                         Reject
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {/* Approved Placements - Awaiting Supervisor Assignment */}
+      <div className={styles.tableContainer}>
+        <h3>Approved Placements - Assign Supervisor</h3>
+        {approvedPlacements.length === 0 ? (
+          <p className={styles.emptyState}>No approved placements awaiting supervisor assignment</p>
+        ) : (
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Company</th>
+                <th>Position</th>
+                <th>Duration</th>
+                <th>Approved</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {approvedPlacements.map((placement) => (
+                <tr key={placement.id}>
+                  <td>
+                    <div className={styles.studentInfo}>
+                      <div className={styles.avatar}>
+                        {placement.student_username.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <div className={styles.studentName}>{placement.student_username}</div>
+                        <div className={styles.studentNumber}>{placement.student_number}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{placement.company_name}</td>
+                  <td>{placement.position_title || 'N/A'}</td>
+                  <td>
+                    {placement.start_date} to {placement.end_date}
+                  </td>
+                  <td>{placement.approved_at ? new Date(placement.approved_at).toLocaleDateString() : 'N/A'}</td>
+                  <td>
+                    <div className={styles.actionButtons}>
+                      <button
+                        className={`${styles.btn} ${styles.btnView}`}
+                        onClick={() => openModal(placement, 'view')}
+                      >
+                        View
+                      </button>
+                      <button
+                        className={`${styles.btn} ${styles.btnAssign}`}
+                        onClick={() => openModal(placement, 'assign')}
+                      >
+                        Assign Supervisor
                       </button>
                     </div>
                   </td>

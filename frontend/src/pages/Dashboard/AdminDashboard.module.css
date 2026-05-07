@@ -338,3 +338,16 @@
     width: 95%;
   }
 }
+
+.btnAssign {
+  background: #8b5cf6;
+  color: white;
+}
+
+.btnAssign:hover {
+  background: #7c3aed;
+}
+
+.tableContainer + .tableContainer {
+  margin-top: 2rem;
+}
