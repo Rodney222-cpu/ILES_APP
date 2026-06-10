@@ -78,7 +78,7 @@ function LoginForm() {
       if (error.response?.data) {
         const backendErrors = Object.values(error.response.data)
           .flat()
-          .join(", ");
+          .join(",");
         setMessage(backendErrors);
       } else {
         setMessage("Network error. Try again");

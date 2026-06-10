@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 
 class CustomUser(AbstractUser):
     ROLES = [
-        ('student',"Student"),
+        ('student','Student'),
         ('workplace_supervisor','Workplace Supervisor'),
         ('academic_supervisor','Academic Supervisor'),
         ('admin', 'Administrator')
