@@ -7,6 +7,7 @@ class Evaluation(models.Model):
         ('pending', 'Pending'),
         ('submitted', 'Submitted'),
         ('approved', 'Approved'),
+    ]
 
     student = models.ForeignKey(
         settings.AUTH_USER_MODEL,
