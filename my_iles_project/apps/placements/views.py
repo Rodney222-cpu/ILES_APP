@@ -14,6 +14,11 @@ from apps.notifications.utils import (
     notify_placement_rejected,
     notify_supervisor_assigned
 )
+from apps.notifications.emails import (
+    send_placement_approved_email,
+    send_placement_rejected_email,
+    send_supervisor_assigned_email
+)
 
 User = get_user_model()
 
@@ -103,8 +108,9 @@ class InternshipPlacementViewSet(viewsets.ModelViewSet):
         placement.admin_comment = request.data.get('admin_comment', '')
         placement.save()
         
-        # Notify student
+        # Notify student (in-app + email)
         notify_placement_approved(placement)
+        send_placement_approved_email(placement)
         
         serializer = self.get_serializer(placement)
         return Response({
@@ -133,8 +139,9 @@ class InternshipPlacementViewSet(viewsets.ModelViewSet):
         placement.admin_comment = admin_comment
         placement.save()
         
-        # Notify student
+        # Notify student (in-app + email)
         notify_placement_rejected(placement)
+        send_placement_rejected_email(placement)
         
         serializer = self.get_serializer(placement)
         return Response({
@@ -167,8 +174,9 @@ class InternshipPlacementViewSet(viewsets.ModelViewSet):
         placement.status = 'active'
         placement.save()
         
-        # Notify both student and supervisor
+        # Notify both student and supervisor (in-app + email)
         notify_supervisor_assigned(placement)
+        send_supervisor_assigned_email(placement)
         
         serializer = self.get_serializer(placement)
         return Response({

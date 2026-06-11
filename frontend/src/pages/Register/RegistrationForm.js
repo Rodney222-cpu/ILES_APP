@@ -9,6 +9,7 @@ function RegistrationForm() {
 
   const [formData, setFormData] = useState({
     username: "",
+    email: "",
     password: "",
     confirmPassword: "",
     role: "student",
@@ -33,8 +34,16 @@ function RegistrationForm() {
   };
 
   const validateForm = () => {
-    if (!formData.username || !formData.password) {
-      setMessage("Username and password are required");
+    if (!formData.username || !formData.password || !formData.email) {
+      setMessage("Username, email, and password are required");
+      setType("error");
+      return false;
+    }
+
+    // Basic email format check
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setMessage("Please enter a valid email address");
       setType("error");
       return false;
     }
@@ -85,6 +94,7 @@ function RegistrationForm() {
       // Clean up payload - only send relevant fields based on role
       const cleanPayload = {
         username: payload.username,
+        email: payload.email,
         password: payload.password,
         role: payload.role,
         department: payload.department || undefined,
@@ -104,6 +114,7 @@ function RegistrationForm() {
 
       setFormData({
         username: "",
+        email: "",
         password: "",
         confirmPassword: "",
         role: "student",
@@ -154,6 +165,18 @@ function RegistrationForm() {
               name="username"
               value={formData.username}
               placeholder="Choose a username"
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Email</label>
+            <input
+              className={styles.input}
+              name="email"
+              type="email"
+              value={formData.email}
+              placeholder="Enter your email address"
               onChange={handleChange}
             />
           </div>
