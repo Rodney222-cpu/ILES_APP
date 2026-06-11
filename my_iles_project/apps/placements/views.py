@@ -205,3 +205,80 @@ class InternshipPlacementViewSet(viewsets.ModelViewSet):
         
         supervisors = User.objects.filter(role='academic_supervisor').values('id', 'username', 'staff_number', 'department')
         return Response(list(supervisors))
+
+    @action(detail=False, methods=['get'])
+    def active(self, request):
+        """Get all active placements (admin only)"""
+        if request.user.role != 'admin':
+            raise PermissionDenied("Only administrators can view active placements.")
+        
+        active_placements = InternshipPlacement.objects.filter(
+            status='active'
+        ).select_related('student', 'academic_supervisor', 'workplace_supervisor')
+        
+        serializer = self.get_serializer(active_placements, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'])
+    def completed(self, request):
+        """Get all completed placements (admin only)"""
+        if request.user.role != 'admin':
+            raise PermissionDenied("Only administrators can view completed placements.")
+        
+        completed_placements = InternshipPlacement.objects.filter(
+            status='completed'
+        ).select_related('student', 'academic_supervisor', 'workplace_supervisor')
+        
+        serializer = self.get_serializer(completed_placements, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'])
+    def stats(self, request):
+        """Get placement statistics (admin only)"""
+        if request.user.role != 'admin':
+            raise PermissionDenied("Only administrators can view stats.")
+        
+        from django.db.models import Count
+        stats = InternshipPlacement.objects.values('status').annotate(count=Count('id'))
+        
+        # Convert to a cleaner format
+        stats_dict = {item['status']: item['count'] for item in stats}
+        
+        return Response({
+            'pending_approval': stats_dict.get('pending_approval', 0),
+            'approved': stats_dict.get('approved', 0),
+            'active': stats_dict.get('active', 0),
+            'completed': stats_dict.get('completed', 0),
+            'rejected': stats_dict.get('rejected', 0),
+            'total': sum(stats_dict.values()),
+        })
+
+    @action(detail=True, methods=['post'])
+    def mark_completed(self, request, pk=None):
+        """Admin marks an active placement as completed"""
+        if request.user.role != 'admin':
+            raise PermissionDenied("Only administrators can mark placements as completed.")
+        
+        placement = self.get_object()
+        
+        if placement.status != 'active':
+            raise ValidationError("Only active placements can be marked as completed.")
+        
+        placement.status = 'completed'
+        placement.save()
+        
+        # Notify student
+        from apps.notifications.utils import create_notification
+        create_notification(
+            recipient=placement.student,
+            notification_type='supervisor_assigned',
+            title='Internship Completed',
+            message=f'Your internship at {placement.company_name} has been marked as completed.',
+            related_placement_id=placement.id
+        )
+        
+        serializer = self.get_serializer(placement)
+        return Response({
+            'message': 'Placement marked as completed',
+            'placement': serializer.data
+        })

@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.utils import timezone
 from .models import InternshipPlacement
 
 
@@ -20,6 +21,7 @@ class InternshipPlacementSerializer(serializers.ModelSerializer):
         read_only=True,
         allow_null=True
     )
+    is_past_end_date = serializers.SerializerMethodField()
 
     class Meta:
         model = InternshipPlacement
@@ -47,7 +49,8 @@ class InternshipPlacementSerializer(serializers.ModelSerializer):
             'approved_by_username',
             'approved_at',
             'created_at',
-            'updated_at'
+            'updated_at',
+            'is_past_end_date'
         ]
         read_only_fields = [
             'student',
@@ -60,6 +63,12 @@ class InternshipPlacementSerializer(serializers.ModelSerializer):
             'workplace_supervisor',
             'academic_supervisor'
         ]
+
+    def get_is_past_end_date(self, obj):
+        """Check if the internship end date has passed."""
+        if obj.end_date:
+            return obj.end_date < timezone.now().date()
+        return False
 
     def validate(self, attrs):
         start_date = attrs.get('start_date')
