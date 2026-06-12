@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { createPlacement } from '../../services/api';
+import { useState, useEffect } from 'react';
+import { createPlacement, getWorkplaceSupervisors } from '../../services/api';
 import styles from './PlacementRequestForm.module.css';
 
 function PlacementRequestForm({ onSuccess }) {
@@ -12,11 +12,25 @@ function PlacementRequestForm({ onSuccess }) {
     position_title: '',
     department: '',
     start_date: '',
-    end_date: ''
+    end_date: '',
+    workplace_supervisor: ''
   });
 
+  const [workplaceSupervisors, setWorkplaceSupervisors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchWS = async () => {
+      try {
+        const response = await getWorkplaceSupervisors();
+        setWorkplaceSupervisors(response.data || []);
+      } catch (err) {
+        console.error('Failed to load workplace supervisors');
+      }
+    };
+    fetchWS();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -115,6 +129,23 @@ function PlacementRequestForm({ onSuccess }) {
               value={formData.company_contact_phone}
               onChange={handleChange}
             />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Workplace Supervisor *</label>
+            <select
+              name="workplace_supervisor"
+              value={formData.workplace_supervisor}
+              onChange={handleChange}
+              required
+            >
+              <option value="">-- Select Your Workplace Supervisor --</option>
+              {workplaceSupervisors.map((sup) => (
+                <option key={sup.id} value={sup.id}>
+                  {sup.username} ({sup.department || 'N/A'})
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 

@@ -242,9 +242,9 @@ class InternshipPlacementViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def workplace_supervisors(self, request):
-        """Get list of available workplace supervisors (admin only)"""
-        if request.user.role != 'admin':
-            raise PermissionDenied("Only administrators can view workplace supervisors.")
+        """Get list of available workplace supervisors (admin or student creating placement)"""
+        if request.user.role not in ['admin', 'student']:
+            raise PermissionDenied("Only administrators and students can view workplace supervisors.")
         
         supervisors = User.objects.filter(role='workplace_supervisor').values('id', 'username', 'staff_number', 'department')
         return Response(list(supervisors))
