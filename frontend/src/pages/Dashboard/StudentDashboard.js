@@ -10,9 +10,6 @@ function StudentDashboard() {
   const [placement, setPlacement] = useState(null);
   const [placementLoading, setPlacementLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [formData, setFormData] = useState({
     description: "",
     hours_spent: "",
@@ -41,7 +38,7 @@ function StudentDashboard() {
       const response = await getWeeklyLogs();
       setLogs(response.data || []);
     } catch (err) {
-      setError("Failed to fetch logs.");
+      console.error("Failed to fetch logs:", err);
     }
   };
 
@@ -57,6 +54,8 @@ function StudentDashboard() {
     }
   }, [logs, currentPage]);
 
+  // TODO: These handlers are ready for a future inline log submission form
+  // eslint-disable-next-line no-unused-vars
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     setFormData((prev) => ({
@@ -65,11 +64,9 @@ function StudentDashboard() {
     }));
   };
 
+  // eslint-disable-next-line no-unused-vars
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
-    setSuccess("");
 
     try {
       const payload = new FormData();
@@ -82,7 +79,6 @@ function StudentDashboard() {
       });
 
       await createWeeklyLog(payload);
-      setSuccess("Log submitted successfully.");
       setFormData({
         description: "",
         hours_spent: "",
@@ -95,14 +91,7 @@ function StudentDashboard() {
       setCurrentPage(1);
       fetchLogs();
     } catch (err) {
-      if (err.response?.data) {
-        const msg = Object.values(err.response.data).flat().join(", ");
-        setError(msg);
-      } else {
-        setError("Failed to submit log.");
-      }
-    } finally {
-      setLoading(false);
+      console.error("Failed to submit log:", err);
     }
   };
 
