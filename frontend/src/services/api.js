@@ -158,6 +158,14 @@ export const getSupervisors = () => {
     return api.get("/placements/supervisors/");
 };
 
+export const getWorkplaceSupervisors = () => {
+    return api.get("/placements/workplace_supervisors/");
+};
+
+export const assignWorkplaceSupervisor = (id, data) => {
+    return api.post(`/placements/${id}/assign_workplace_supervisor/`, data);
+};
+
 export const getActivePlacements = () => {
     return api.get("/placements/active/");
 };

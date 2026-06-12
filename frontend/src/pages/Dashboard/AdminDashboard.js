@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getPendingPlacements, approvePlacement, rejectPlacement, assignSupervisor, getSupervisors, getPlacement, getActivePlacements, getCompletedPlacements, getPlacementStats, markPlacementCompleted } from '../../services/api';
+import { getPendingPlacements, approvePlacement, rejectPlacement, assignSupervisor, getSupervisors, getPlacement, getActivePlacements, getCompletedPlacements, getPlacementStats, markPlacementCompleted, getWorkplaceSupervisors, assignWorkplaceSupervisor } from '../../services/api';
 import styles from './AdminDashboard.module.css';
 
 function AdminDashboard() {
@@ -9,6 +9,8 @@ function AdminDashboard() {
   const [completedPlacements, setCompletedPlacements] = useState([]);
   const [stats, setStats] = useState({ pending_approval: 0, approved: 0, active: 0, completed: 0, rejected: 0, total: 0 });
   const [supervisors, setSupervisors] = useState([]);
+  const [workplaceSupervisors, setWorkplaceSupervisors] = useState([]);
+  const [selectedWorkplaceSupervisor, setSelectedWorkplaceSupervisor] = useState('');
   const [loading, setLoading] = useState(true);
   const [selectedPlacement, setSelectedPlacement] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -51,6 +53,8 @@ function AdminDashboard() {
     try {
       const response = await getSupervisors();
       setSupervisors(response.data || []);
+      const wsResponse = await getWorkplaceSupervisors();
+      setWorkplaceSupervisors(wsResponse.data || []);
     } catch (err) {
       console.error('Failed to load supervisors');
     }
@@ -112,11 +116,26 @@ function AdminDashboard() {
     }
     try {
       await assignSupervisor(selectedPlacement.id, { academic_supervisor_id: selectedSupervisor });
-      setMessage('Supervisor assigned successfully!');
+      setMessage('Academic supervisor assigned successfully!');
       fetchPlacements();
       setTimeout(() => closeModal(), 1500);
     } catch (err) {
       setError('Failed to assign supervisor');
+    }
+  };
+
+  const handleAssignWorkplaceSupervisor = async () => {
+    if (!selectedWorkplaceSupervisor) {
+      setError('Please select a workplace supervisor');
+      return;
+    }
+    try {
+      await assignWorkplaceSupervisor(selectedPlacement.id, { workplace_supervisor_id: selectedWorkplaceSupervisor });
+      setMessage('Workplace supervisor assigned successfully!');
+      fetchPlacements();
+      setTimeout(() => closeModal(), 1500);
+    } catch (err) {
+      setError('Failed to assign workplace supervisor');
     }
   };
 
@@ -297,7 +316,13 @@ function AdminDashboard() {
                         className={`${styles.btn} ${styles.btnAssign}`}
                         onClick={() => openModal(placement, 'assign')}
                       >
-                        Assign Supervisor
+                        Assign Academic Supervisor
+                      </button>
+                      <button
+                        className={`${styles.btn} ${styles.btnAssign}`}
+                        onClick={() => openModal(placement, 'assign_workplace')}
+                      >
+                        Assign Workplace Supervisor
                       </button>
                     </div>
                   </td>
@@ -540,7 +565,7 @@ function AdminDashboard() {
                     value={selectedSupervisor}
                     onChange={(e) => setSelectedSupervisor(e.target.value)}
                   >
-                    <option value="">-- Select Supervisor --</option>
+                    <option value="">-- Select Academic Supervisor --</option>
                     {supervisors.map((sup) => (
                       <option key={sup.id} value={sup.id}>
                         {sup.username} - {sup.department || 'N/A'}
@@ -549,7 +574,32 @@ function AdminDashboard() {
                   </select>
                   <div className={styles.actionFormButtons}>
                     <button className={styles.btnApprove} onClick={handleAssignSupervisor}>
-                      Assign Supervisor
+                      Assign Academic Supervisor
+                    </button>
+                    <button className={styles.btnCancel} onClick={closeModal}>
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {modalType === 'assign_workplace' && (
+                <div className={styles.actionForm}>
+                  <label>Select Workplace Supervisor *</label>
+                  <select
+                    value={selectedWorkplaceSupervisor}
+                    onChange={(e) => setSelectedWorkplaceSupervisor(e.target.value)}
+                  >
+                    <option value="">-- Select Workplace Supervisor --</option>
+                    {workplaceSupervisors.map((sup) => (
+                      <option key={sup.id} value={sup.id}>
+                        {sup.username} - {sup.department || 'N/A'}
+                      </option>
+                    ))}
+                  </select>
+                  <div className={styles.actionFormButtons}>
+                    <button className={styles.btnApprove} onClick={handleAssignWorkplaceSupervisor}>
+                      Assign Workplace Supervisor
                     </button>
                     <button className={styles.btnCancel} onClick={closeModal}>
                       Cancel
