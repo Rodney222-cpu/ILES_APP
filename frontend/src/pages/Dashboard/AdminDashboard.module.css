@@ -348,6 +348,91 @@
   background: #7c3aed;
 }
 
+.btnComplete {
+  background: #059669;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnComplete:hover {
+  background: #047857;
+}
+
+/* Stat card color accents */
+.statPending {
+  border-top: 4px solid #f59e0b;
+}
+
+.statApproved {
+  border-top: 4px solid #3b82f6;
+}
+
+.statActive {
+  border-top: 4px solid #8b5cf6;
+}
+
+.statCompleted {
+  border-top: 4px solid #10b981;
+}
+
+/* Avatar color variants */
+.avatarActive {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+}
+
+.avatarCompleted {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+/* Status badge */
+.badgeCompleted {
+  display: inline-block;
+  background: #d1fae5;
+  color: #065f46;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* End Date Passed badge */
+.badgeEndDatePassed {
+  display: inline-block;
+  background: #fef3c7;
+  color: #92400e;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid #f59e0b;
+}
+
+/* End Date Alert Banner */
+.endDateAlert {
+  background: #fffbeb;
+  border: 1px solid #f59e0b;
+  border-left: 4px solid #f59e0b;
+  padding: 1rem 1.25rem;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+  color: #92400e;
+}
+
+.endDateAlert ul {
+  margin: 0.5rem 0 0 0;
+  padding-left: 1.5rem;
+}
+
+.endDateAlert li {
+  margin-bottom: 0.25rem;
+}
+
 .tableContainer + .tableContainer {
   margin-top: 2rem;
 }

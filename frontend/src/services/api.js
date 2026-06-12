@@ -122,6 +122,22 @@ export const getSupervisors = () => {
     return api.get("/placements/supervisors/");
 };
 
+export const getActivePlacements = () => {
+    return api.get("/placements/active/");
+};
+
+export const getCompletedPlacements = () => {
+    return api.get("/placements/completed/");
+};
+
+export const getPlacementStats = () => {
+    return api.get("/placements/stats/");
+};
+
+export const markPlacementCompleted = (id) => {
+    return api.post(`/placements/${id}/mark_completed/`);
+};
+
 // Evaluation APIs
 export const getEvaluations = () => {
     return api.get("/evaluations/evaluations/");

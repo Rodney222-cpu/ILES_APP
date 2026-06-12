@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
-import { getPendingPlacements, approvePlacement, rejectPlacement, assignSupervisor, getSupervisors, getPlacement } from '../../services/api';
+import { getPendingPlacements, approvePlacement, rejectPlacement, assignSupervisor, getSupervisors, getPlacement, getActivePlacements, getCompletedPlacements, getPlacementStats, markPlacementCompleted } from '../../services/api';
 import styles from './AdminDashboard.module.css';
 
 function AdminDashboard() {
   const [pendingPlacements, setPendingPlacements] = useState([]);
   const [approvedPlacements, setApprovedPlacements] = useState([]);
+  const [activePlacements, setActivePlacements] = useState([]);
+  const [completedPlacements, setCompletedPlacements] = useState([]);
+  const [stats, setStats] = useState({ pending_approval: 0, approved: 0, active: 0, completed: 0, rejected: 0, total: 0 });
   const [supervisors, setSupervisors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPlacement, setSelectedPlacement] = useState(null);
@@ -21,10 +24,22 @@ function AdminDashboard() {
       const pendingResponse = await getPendingPlacements();
       setPendingPlacements(pendingResponse.data || []);
       
-      // Fetch all placements to get approved ones
+      // Fetch approved placements (awaiting supervisor)
       const allResponse = await getPlacement();
       const approved = (allResponse.data || []).filter(p => p.status === 'approved');
       setApprovedPlacements(approved);
+
+      // Fetch active placements
+      const activeResponse = await getActivePlacements();
+      setActivePlacements(activeResponse.data || []);
+
+      // Fetch completed placements
+      const completedResponse = await getCompletedPlacements();
+      setCompletedPlacements(completedResponse.data || []);
+
+      // Fetch stats
+      const statsResponse = await getPlacementStats();
+      setStats(statsResponse.data || {});
     } catch (err) {
       setError('Failed to load placements');
     } finally {
@@ -105,6 +120,17 @@ function AdminDashboard() {
     }
   };
 
+  const handleMarkCompleted = async () => {
+    try {
+      await markPlacementCompleted(selectedPlacement.id);
+      setMessage('Internship marked as completed!');
+      fetchPlacements();
+      setTimeout(() => closeModal(), 1500);
+    } catch (err) {
+      setError('Failed to mark as completed');
+    }
+  };
+
   if (loading) {
     return <div className={styles.page}><p>Loading...</p></div>;
   }
@@ -118,17 +144,43 @@ function AdminDashboard() {
 
       <div className={styles.statsCards}>
         <div className={styles.statCard}>
-          <div className={styles.statValue}>{pendingPlacements.length}</div>
+          <div className={styles.statValue}>{stats.total}</div>
+          <div className={styles.statLabel}>Total Placements</div>
+        </div>
+        <div className={`${styles.statCard} ${styles.statPending}`}>
+          <div className={styles.statValue}>{stats.pending_approval}</div>
           <div className={styles.statLabel}>Pending Approvals</div>
         </div>
-        <div className={styles.statCard}>
-          <div className={styles.statValue}>{approvedPlacements.length}</div>
-          <div className={styles.statLabel}>Awaiting Supervisor Assignment</div>
+        <div className={`${styles.statCard} ${styles.statApproved}`}>
+          <div className={styles.statValue}>{stats.approved}</div>
+          <div className={styles.statLabel}>Awaiting Supervisor</div>
+        </div>
+        <div className={`${styles.statCard} ${styles.statActive}`}>
+          <div className={styles.statValue}>{stats.active}</div>
+          <div className={styles.statLabel}>Active Internships</div>
+        </div>
+        <div className={`${styles.statCard} ${styles.statCompleted}`}>
+          <div className={styles.statValue}>{stats.completed}</div>
+          <div className={styles.statLabel}>Completed Internships</div>
         </div>
       </div>
 
       {message && <div className={styles.successAlert}>{message}</div>}
       {error && <div className={styles.errorAlert}>{error}</div>}
+
+      {/* End Date Alert for active internships that have passed their end date */}
+      {activePlacements.filter(p => p.is_past_end_date).length > 0 && (
+        <div className={styles.endDateAlert}>
+          <strong>Internship End Date Reached:</strong> {activePlacements.filter(p => p.is_past_end_date).length} student(s) have reached their internship end date and are ready to be marked as completed.
+          <ul>
+            {activePlacements.filter(p => p.is_past_end_date).map(p => (
+              <li key={p.id}>
+                <strong>{p.student_username}</strong> — {p.company_name} (ended {p.end_date})
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Pending Placements Table */}
       <div className={styles.tableContainer}>
@@ -256,6 +308,116 @@ function AdminDashboard() {
         )}
       </div>
 
+      {/* Active Internships */}
+      <div className={styles.tableContainer}>
+        <h3>Active Internships</h3>
+        {activePlacements.length === 0 ? (
+          <p className={styles.emptyState}>No active internships</p>
+        ) : (
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Company</th>
+                <th>Position</th>
+                <th>Duration</th>
+                <th>Academic Supervisor</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {activePlacements.map((placement) => (
+                <tr key={placement.id}>
+                  <td>
+                    <div className={styles.studentInfo}>
+                      <div className={`${styles.avatar} ${styles.avatarActive}`}>
+                        {placement.student_username.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <div className={styles.studentName}>{placement.student_username}</div>
+                        <div className={styles.studentNumber}>{placement.student_number}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{placement.company_name}</td>
+                  <td>{placement.position_title || 'N/A'}</td>
+                  <td>
+                    {placement.start_date} to {placement.end_date}
+                  </td>
+                  <td>{placement.academic_supervisor_username || 'N/A'}</td>
+                  <td>
+                    <div className={styles.actionButtons}>
+                      <button
+                        className={`${styles.btn} ${styles.btnView}`}
+                        onClick={() => openModal(placement, 'view')}
+                      >
+                        View
+                      </button>
+                      {placement.is_past_end_date && (
+                        <span className={styles.badgeEndDatePassed}>End Date Passed</span>
+                      )}
+                      <button
+                        className={`${styles.btn} ${styles.btnComplete}`}
+                        onClick={() => openModal(placement, 'complete')}
+                      >
+                        Mark Completed
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {/* Completed Internships */}
+      <div className={styles.tableContainer}>
+        <h3>Completed Internships ({completedPlacements.length} students)</h3>
+        {completedPlacements.length === 0 ? (
+          <p className={styles.emptyState}>No completed internships yet</p>
+        ) : (
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Company</th>
+                <th>Position</th>
+                <th>Duration</th>
+                <th>Academic Supervisor</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {completedPlacements.map((placement) => (
+                <tr key={placement.id}>
+                  <td>
+                    <div className={styles.studentInfo}>
+                      <div className={`${styles.avatar} ${styles.avatarCompleted}`}>
+                        {placement.student_username.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <div className={styles.studentName}>{placement.student_username}</div>
+                        <div className={styles.studentNumber}>{placement.student_number}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{placement.company_name}</td>
+                  <td>{placement.position_title || 'N/A'}</td>
+                  <td>
+                    {placement.start_date} to {placement.end_date}
+                  </td>
+                  <td>{placement.academic_supervisor_username || 'N/A'}</td>
+                  <td>
+                    <span className={styles.badgeCompleted}>Completed</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
       {/* Modal */}
       {showModal && selectedPlacement && (
         <div className={styles.modalOverlay} onClick={closeModal}>
@@ -266,6 +428,7 @@ function AdminDashboard() {
                 {modalType === 'approve' && 'Approve Placement'}
                 {modalType === 'reject' && 'Reject Placement'}
                 {modalType === 'assign' && 'Assign Supervisor'}
+                {modalType === 'complete' && 'Mark Internship as Completed'}
               </h3>
               <button className={styles.closeBtn} onClick={closeModal}>×</button>
             </div>
@@ -387,6 +550,22 @@ function AdminDashboard() {
                   <div className={styles.actionFormButtons}>
                     <button className={styles.btnApprove} onClick={handleAssignSupervisor}>
                       Assign Supervisor
+                    </button>
+                    <button className={styles.btnCancel} onClick={closeModal}>
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {modalType === 'complete' && (
+                <div className={styles.actionForm}>
+                  <p style={{ color: '#4b5563', marginBottom: '1rem' }}>
+                    Are you sure you want to mark <strong>{selectedPlacement.student_username}</strong>'s internship at <strong>{selectedPlacement.company_name}</strong> as completed?
+                  </p>
+                  <div className={styles.actionFormButtons}>
+                    <button className={styles.btnComplete} onClick={handleMarkCompleted}>
+                      Confirm Completed
                     </button>
                     <button className={styles.btnCancel} onClick={closeModal}>
                       Cancel

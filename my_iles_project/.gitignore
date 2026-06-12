@@ -35,4 +35,6 @@ media/*
 .vscode/
 .idea/
 
-migrations/
+# NOTE: migrations/ must NOT be ignored - they need to be tracked in git
+# Ignore only pycache inside migrations
+**/migrations/__pycache__/

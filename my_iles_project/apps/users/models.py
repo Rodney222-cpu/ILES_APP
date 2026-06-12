@@ -10,6 +10,7 @@ class CustomUser(AbstractUser):
         ('admin', 'Administrator')
         ]
     
+    email = models.EmailField(unique=True)
     role = models.CharField(
         max_length=20,
         choices=ROLES, 
@@ -35,6 +36,12 @@ class CustomUser(AbstractUser):
     
 
     def clean(self):
+        # EMAIL REQUIRED
+        if not self.email:
+            raise ValidationError({
+                "email": "Email is required"
+            })
+
         # STUDENT RULES
         if self.role == "student":
             if not self.student_number:
