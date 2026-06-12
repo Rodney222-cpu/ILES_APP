@@ -12,8 +12,8 @@ class WeeklyLogSerializer(serializers.ModelSerializer):
             return value
         if value <= 0:
             raise serializers.ValidationError("Hours must be greater than zero.")
-        if value > 24:
-            raise serializers.ValidationError("Hours cannot exceed 24 in one day.")
+        if value > 60:
+            raise serializers.ValidationError("Hours cannot exceed 60 in one week.")
         return value
 
     def validate(self, attrs):

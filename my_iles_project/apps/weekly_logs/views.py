@@ -33,18 +33,28 @@ class WeeklyLogView(viewsets.ModelViewSet):
             queryset = WeeklyLogModel.objects.filter(
                 placement__workplace_supervisor=user,
             )
+            # Workplace supervisor only sees SUBMITTED logs (for review, not evaluation)
+            if not status_filter:
+                queryset = queryset.filter(status='SUBMITTED')
+            elif status_filter.upper() != 'ALL':
+                queryset = queryset.filter(status=status_filter.upper())
 
         elif user.role == "academic_supervisor":
             queryset = WeeklyLogModel.objects.filter(
                 placement__academic_supervisor=user,
             )
+            # Academic supervisor only sees REVIEWED logs (reviewed by workplace supervisor first)
+            if not status_filter:
+                queryset = queryset.filter(status='REVIEWED')
+            elif status_filter.upper() != 'ALL':
+                queryset = queryset.filter(status=status_filter.upper())
 
         elif user.role == "admin":
             queryset = WeeklyLogModel.objects.all()
         else:
             queryset = WeeklyLogModel.objects.none()
 
-        if status_filter:
+        if status_filter and status_filter.upper() != 'ALL':
             queryset = queryset.filter(status=status_filter.upper())
 
         return queryset.select_related("placement", "placement__student")

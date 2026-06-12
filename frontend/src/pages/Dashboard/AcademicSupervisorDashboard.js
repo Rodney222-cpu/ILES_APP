@@ -94,7 +94,7 @@ function AcademicSupervisorDashboard() {
     <div className={styles.page}>
       <div className={styles.header}>
         <h1 className={styles.title}>Academic Supervisor Dashboard</h1>
-        <p className={styles.subtitle}>Internship Logging & Evaluation System (ILES)</p>
+        <p className={styles.subtitle}>Evaluate and grade student weekly logs (after workplace review)</p>
       </div>
 
       {/* Assigned Students Section */}
@@ -146,11 +146,9 @@ function AcademicSupervisorDashboard() {
           className={styles.filterSelect}
         >
           <option value="ALL">All Logs</option>
-          <option value="SUBMITTED">Submitted</option>
-          <option value="REVIEWED">Reviewed</option>
+          <option value="REVIEWED">Awaiting Evaluation</option>
           <option value="APPROVED">Approved</option>
           <option value="REJECTED">Rejected</option>
-          <option value="DRAFT">Draft</option>
         </select>
         <button
           type="button"
@@ -237,30 +235,30 @@ function AcademicSupervisorDashboard() {
                   </td>
                   <td>
                     <div className={styles.actionButtons}>
-                      <button
-                        type="button"
-                        className={`${styles.actionBtn} ${styles.reviewBtn}`}
-                        onClick={() => handleDecision(log.id, "REVIEWED")}
-                        title="Review Log"
-                      >
-                        Review Log
-                      </button>
-                      <button
-                        type="button"
-                        className={`${styles.actionBtn} ${styles.approveBtn}`}
-                        onClick={() => handleDecision(log.id, "APPROVED")}
-                        title="Approve"
-                      >
-                        Approve
-                      </button>
-                      <button
-                        type="button"
-                        className={`${styles.actionBtn} ${styles.rejectBtn}`}
-                        onClick={() => handleDecision(log.id, "REJECTED")}
-                        title="Reject"
-                      >
-                        Reject
-                      </button>
+                      {log.status === "REVIEWED" ? (
+                        <>
+                          <button
+                            type="button"
+                            className={`${styles.actionBtn} ${styles.approveBtn}`}
+                            onClick={() => handleDecision(log.id, "APPROVED")}
+                            title="Approve with grade"
+                          >
+                            Approve
+                          </button>
+                          <button
+                            type="button"
+                            className={`${styles.actionBtn} ${styles.rejectBtn}`}
+                            onClick={() => handleDecision(log.id, "REJECTED")}
+                            title="Reject - needs improvement"
+                          >
+                            Reject
+                          </button>
+                        </>
+                      ) : (
+                        <span className={styles.statusBadge}>
+                          {log.status}
+                        </span>
+                      )}
                     </div>
                   </td>
                 </tr>

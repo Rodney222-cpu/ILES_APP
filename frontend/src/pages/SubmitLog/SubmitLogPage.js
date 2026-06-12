@@ -272,7 +272,7 @@ function SubmitLogPage() {
                 type="number"
                 name="hours_spent"
                 min="0.5"
-                max="24"
+                max="60"
                 step="0.5"
                 placeholder="e.g., 8"
                 value={formData.hours_spent}

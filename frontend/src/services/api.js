@@ -5,7 +5,7 @@ const api = axios.create({
     headers: {
         "Content-Type": "application/json"
     },
-    timeout:10000,
+    timeout:30000,
 });
 
 export const setAuthToken = (access, refresh, role, username) => {
@@ -18,6 +18,10 @@ export const setAuthToken = (access, refresh, role, username) => {
 
 export const getAuthToken = () => {
     return localStorage.getItem("access");
+}
+
+export const getRefreshToken = () => {
+    return localStorage.getItem("refresh");
 }
 
 export const getUserRole = () => {
@@ -46,8 +50,40 @@ api.interceptors.request.use(
 api.interceptors.response.use(
     (response) => response,
 
-    (error) => {
-        if(error.response && error.response.status === 401) {
+    async (error) => {
+        const originalRequest = error.config;
+
+        // If 401 and we haven't already retried, try to refresh the token
+        if (error.response && error.response.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+
+            const refreshToken = getRefreshToken();
+            if (refreshToken) {
+                try {
+                    const response = await axios.post(
+                        (process.env.REACT_APP_API_URL || "http://127.0.0.1:8000") + "/users/refresh/",
+                        { refresh: refreshToken }
+                    );
+                    const newAccessToken = response.data.access;
+                    localStorage.setItem("access", newAccessToken);
+
+                    // If refresh rotation is on, save the new refresh token
+                    if (response.data.refresh) {
+                        localStorage.setItem("refresh", response.data.refresh);
+                    }
+
+                    // Retry the original request with the new token
+                    originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                    return api(originalRequest);
+                } catch (refreshError) {
+                    // Refresh failed - token is truly expired, log out
+                    removeAuthToken();
+                    window.location.href = "/login";
+                    return Promise.reject(refreshError);
+                }
+            }
+
+            // No refresh token available
             removeAuthToken();
             window.location.href = "/login";
         }
@@ -120,6 +156,14 @@ export const assignSupervisor = (id, data) => {
 
 export const getSupervisors = () => {
     return api.get("/placements/supervisors/");
+};
+
+export const getWorkplaceSupervisors = () => {
+    return api.get("/placements/workplace_supervisors/");
+};
+
+export const assignWorkplaceSupervisor = (id, data) => {
+    return api.post(`/placements/${id}/assign_workplace_supervisor/`, data);
 };
 
 export const getActivePlacements = () => {

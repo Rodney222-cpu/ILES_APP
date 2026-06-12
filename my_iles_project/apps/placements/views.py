@@ -184,6 +184,40 @@ class InternshipPlacementViewSet(viewsets.ModelViewSet):
             'placement': serializer.data
         })
 
+    @action(detail=True, methods=['post'])
+    def assign_workplace_supervisor(self, request, pk=None):
+        """Admin assigns workplace supervisor to approved placement"""
+        if request.user.role != 'admin':
+            raise PermissionDenied("Only administrators can assign workplace supervisors.")
+        
+        placement = self.get_object()
+        
+        if placement.status not in ['approved', 'active']:
+            raise ValidationError("Can only assign workplace supervisors to approved placements.")
+        
+        workplace_supervisor_id = request.data.get('workplace_supervisor_id')
+        
+        if not workplace_supervisor_id:
+            raise ValidationError({'workplace_supervisor_id': 'This field is required.'})
+        
+        try:
+            supervisor = User.objects.get(id=workplace_supervisor_id, role='workplace_supervisor')
+        except User.DoesNotExist:
+            raise ValidationError({'workplace_supervisor_id': 'Invalid workplace supervisor.'})
+        
+        placement.workplace_supervisor = supervisor
+        if not placement.academic_supervisor:
+            pass  # Don't change status yet, wait for academic supervisor
+        else:
+            placement.status = 'active'
+        placement.save()
+        
+        serializer = self.get_serializer(placement)
+        return Response({
+            'message': 'Workplace supervisor assigned successfully',
+            'placement': serializer.data
+        })
+
     @action(detail=False, methods=['get'])
     def pending(self, request):
         """Get all pending placement requests (admin only)"""
@@ -204,6 +238,15 @@ class InternshipPlacementViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("Only administrators can view supervisors.")
         
         supervisors = User.objects.filter(role='academic_supervisor').values('id', 'username', 'staff_number', 'department')
+        return Response(list(supervisors))
+
+    @action(detail=False, methods=['get'])
+    def workplace_supervisors(self, request):
+        """Get list of available workplace supervisors (admin or student creating placement)"""
+        if request.user.role not in ['admin', 'student']:
+            raise PermissionDenied("Only administrators and students can view workplace supervisors.")
+        
+        supervisors = User.objects.filter(role='workplace_supervisor').values('id', 'username', 'staff_number', 'department')
         return Response(list(supervisors))
 
     @action(detail=False, methods=['get'])

@@ -60,7 +60,6 @@ class InternshipPlacementSerializer(serializers.ModelSerializer):
             'approved_at',
             'created_at',
             'updated_at',
-            'workplace_supervisor',
             'academic_supervisor'
         ]
 

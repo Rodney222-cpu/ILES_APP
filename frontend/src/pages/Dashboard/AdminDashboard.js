@@ -112,7 +112,7 @@ function AdminDashboard() {
     }
     try {
       await assignSupervisor(selectedPlacement.id, { academic_supervisor_id: selectedSupervisor });
-      setMessage('Supervisor assigned successfully!');
+      setMessage('Academic supervisor assigned successfully!');
       fetchPlacements();
       setTimeout(() => closeModal(), 1500);
     } catch (err) {
