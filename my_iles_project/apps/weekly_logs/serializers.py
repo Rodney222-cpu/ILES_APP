@@ -54,6 +54,7 @@ class WeeklyLogSerializer(serializers.ModelSerializer):
             'challenges',
             'learning',
             'week_number',
+            'workplace_reviewer_name',
             'supervisor_comment',
             'deadline',
             'submitted_at',
@@ -66,6 +67,7 @@ class WeeklyLogSerializer(serializers.ModelSerializer):
             'log_date',   # Auto-set to today's date
             'deadline',   # Auto-calculated or set by supervisor
             'status',
+            'workplace_reviewer_name',
             'supervisor_comment',
             'submitted_at',
             'created_at',

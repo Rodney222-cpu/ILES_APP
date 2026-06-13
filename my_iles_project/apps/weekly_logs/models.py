@@ -30,6 +30,12 @@ class WeeklyLogModel(models.Model):
         blank=True
         )
     week_number = models.PositiveIntegerField()
+    workplace_reviewer_name = models.CharField(
+        max_length=150,
+        blank=True,
+        null=True,
+        help_text="Name of the workplace supervisor who reviewed this log"
+    )
     supervisor_comment = models.TextField(
         blank=True
         )
@@ -47,4 +53,3 @@ class WeeklyLogModel(models.Model):
     
     class Meta:
         unique_together = [["placement", "week_number"]]
-   

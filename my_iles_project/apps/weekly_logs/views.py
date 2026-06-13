@@ -191,6 +191,8 @@ class WeeklyLogView(viewsets.ModelViewSet):
         if not comment:
             raise ValidationError("Comment is required")
 
+        # Save the workplace supervisor's name and comment on the log
+        log.workplace_reviewer_name = user.get_full_name() or user.username
         log.supervisor_comment = comment
         log.status = "REVIEWED"
         log.save()
