@@ -81,11 +81,35 @@ function AdminDashboard() {
 
   const handleApprove = async () => {
     try {
-      await approvePlacement(selectedPlacement.id, { admin_comment: adminComment });
+      const response = await approvePlacement(selectedPlacement.id, { admin_comment: adminComment });
+      
+      // Optimistic update: immediately move placement from pending to approved
+      const approvedPlacement = response.data?.placement || {
+        ...selectedPlacement,
+        status: 'approved',
+        admin_comment: adminComment,
+        approved_at: new Date().toISOString()
+      };
+      
+      setPendingPlacements(prev => prev.filter(p => p.id !== selectedPlacement.id));
+      setApprovedPlacements(prev => [...prev, approvedPlacement]);
+      setStats(prev => ({
+        ...prev,
+        pending_approval: Math.max(0, (prev.pending_approval || 0) - 1),
+        approved: (prev.approved || 0) + 1,
+      }));
+      
       setMessage('Placement approved successfully!');
-      fetchPlacements();
-      setTimeout(() => closeModal(), 1500);
+      closeModal();
+      
+      // Background sync with server to ensure consistency
+      try {
+        await fetchPlacements();
+      } catch (syncErr) {
+        console.error('Background sync failed after approval:', syncErr);
+      }
     } catch (err) {
+      console.error('Approve placement error:', err);
       setError('Failed to approve placement');
     }
   };
@@ -97,10 +121,26 @@ function AdminDashboard() {
     }
     try {
       await rejectPlacement(selectedPlacement.id, { admin_comment: adminComment });
+      
+      // Optimistic update: remove from pending placements
+      setPendingPlacements(prev => prev.filter(p => p.id !== selectedPlacement.id));
+      setStats(prev => ({
+        ...prev,
+        pending_approval: Math.max(0, (prev.pending_approval || 0) - 1),
+        rejected: (prev.rejected || 0) + 1,
+      }));
+      
       setMessage('Placement rejected');
-      fetchPlacements();
-      setTimeout(() => closeModal(), 1500);
+      closeModal();
+      
+      // Background sync
+      try {
+        await fetchPlacements();
+      } catch (syncErr) {
+        console.error('Background sync failed after rejection:', syncErr);
+      }
     } catch (err) {
+      console.error('Reject placement error:', err);
       setError('Failed to reject placement');
     }
   };
@@ -112,10 +152,27 @@ function AdminDashboard() {
     }
     try {
       await assignSupervisor(selectedPlacement.id, { academic_supervisor_id: selectedSupervisor });
+      
+      // Optimistic update: move from approved to active
+      setApprovedPlacements(prev => prev.filter(p => p.id !== selectedPlacement.id));
+      setActivePlacements(prev => [...prev, { ...selectedPlacement, status: 'active', academic_supervisor_id: selectedSupervisor }]);
+      setStats(prev => ({
+        ...prev,
+        approved: Math.max(0, (prev.approved || 0) - 1),
+        active: (prev.active || 0) + 1,
+      }));
+      
       setMessage('Academic supervisor assigned successfully!');
-      fetchPlacements();
-      setTimeout(() => closeModal(), 1500);
+      closeModal();
+      
+      // Background sync
+      try {
+        await fetchPlacements();
+      } catch (syncErr) {
+        console.error('Background sync failed after supervisor assignment:', syncErr);
+      }
     } catch (err) {
+      console.error('Assign supervisor error:', err);
       setError('Failed to assign supervisor');
     }
   };
@@ -123,10 +180,27 @@ function AdminDashboard() {
   const handleMarkCompleted = async () => {
     try {
       await markPlacementCompleted(selectedPlacement.id);
+      
+      // Optimistic update: move from active to completed
+      setActivePlacements(prev => prev.filter(p => p.id !== selectedPlacement.id));
+      setCompletedPlacements(prev => [...prev, { ...selectedPlacement, status: 'completed' }]);
+      setStats(prev => ({
+        ...prev,
+        active: Math.max(0, (prev.active || 0) - 1),
+        completed: (prev.completed || 0) + 1,
+      }));
+      
       setMessage('Internship marked as completed!');
-      fetchPlacements();
-      setTimeout(() => closeModal(), 1500);
+      closeModal();
+      
+      // Background sync
+      try {
+        await fetchPlacements();
+      } catch (syncErr) {
+        console.error('Background sync failed after marking completed:', syncErr);
+      }
     } catch (err) {
+      console.error('Mark completed error:', err);
       setError('Failed to mark as completed');
     }
   };
