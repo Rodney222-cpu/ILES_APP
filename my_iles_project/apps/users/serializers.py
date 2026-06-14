@@ -19,7 +19,8 @@ class RegisterSerializer(serializers.ModelSerializer):
             'role',
             'student_number',
             'staff_number',
-            'department'
+            'department',
+            'company_name'
         ]
 
     def validate_email(self, value):
@@ -32,6 +33,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         role = data.get('role')
         student_number = data.get('student_number')
         staff_number = data.get('staff_number')
+        company_name = data.get('company_name')
 
         # STUDENT VALIDATION
         if role == 'student':
@@ -44,11 +46,28 @@ class RegisterSerializer(serializers.ModelSerializer):
                     'staff_number': 'Students cannot have a staff number'
                 })
 
-        # SUPERVISOR VALIDATION
-        if role in ['workplace_supervisor', 'academic_supervisor']:
+        # WORKPLACE SUPERVISOR VALIDATION
+        if role == 'workplace_supervisor':
             if not staff_number:
                 raise serializers.ValidationError({
-                    'staff_number': 'Supervisors must have a staff number'
+                    'staff_number': 'Workplace supervisor must have a staff number'
+                })
+            if not company_name:
+                raise serializers.ValidationError({
+                    'company_name': 'Workplace supervisor must have a company name'
+                })
+            if student_number:
+                raise serializers.ValidationError({
+                    'student_number': 'Supervisors cannot have a student number'
+                })
+            # Clear student_number if accidentally provided
+            data['student_number'] = None
+
+        # ACADEMIC SUPERVISOR VALIDATION
+        if role == 'academic_supervisor':
+            if not staff_number:
+                raise serializers.ValidationError({
+                    'staff_number': 'Academic supervisor must have a staff number'
                 })
             if student_number:
                 raise serializers.ValidationError({

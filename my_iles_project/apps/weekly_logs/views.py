@@ -31,9 +31,17 @@ class WeeklyLogView(viewsets.ModelViewSet):
             queryset = WeeklyLogModel.objects.filter(placement__student=user)
 
         elif user.role == "workplace_supervisor":
-            queryset = WeeklyLogModel.objects.filter(
-                placement__workplace_supervisor=user,
-            )
+            # Workplace supervisor only sees logs from their company
+            if user.company_name:
+                queryset = WeeklyLogModel.objects.filter(
+                    placement__workplace_supervisor=user,
+                    placement__company_name__iexact=user.company_name  # Case-insensitive match
+                )
+            else:
+                # If no company assigned, only show logs from assigned placements
+                queryset = WeeklyLogModel.objects.filter(
+                    placement__workplace_supervisor=user,
+                )
             # Workplace supervisor sees SUBMITTED logs for review
             if not status_filter:
                 queryset = queryset.filter(status='SUBMITTED')

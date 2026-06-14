@@ -11,6 +11,11 @@ class InternshipPlacementSerializer(serializers.ModelSerializer):
         read_only=True,
         allow_null=True
     )
+    workplace_supervisor_company = serializers.CharField(
+        source="workplace_supervisor.company_name",
+        read_only=True,
+        allow_null=True
+    )
     academic_supervisor_username = serializers.CharField(
         source="academic_supervisor.username",
         read_only=True,
@@ -41,6 +46,7 @@ class InternshipPlacementSerializer(serializers.ModelSerializer):
             'end_date',
             'workplace_supervisor',
             'workplace_supervisor_username',
+            'workplace_supervisor_company',
             'academic_supervisor',
             'academic_supervisor_username',
             'status',

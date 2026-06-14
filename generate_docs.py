@@ -548,8 +548,26 @@ business_rules = [
     ['Comments mandatory at each stage', 'Serializer validation requires non-empty comments', 'API returns 400 if comment missing'],
     ['Sequential status transitions', 'Model clean() validates status flow', 'Cannot skip stages in workflow'],
 ]
-business_table = Table(business_rules, colWidths=[120, 200, 180])
-business_table.setStyle(TableStyle(table_header_row()))
+business_table = Table(business_rules, colWidths=[100, 180, 220])
+business_table.setStyle(TableStyle([
+    ('BACKGROUND', (0, 0), (-1, 0), HexColor('#1a237e')),
+    ('TEXTCOLOR', (0, 0), (-1, 0), white),
+    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+    ('FONTSIZE', (0, 0), (-1, 0), 9),
+    ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+    ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+    ('TOPPADDING', (0, 0), (-1, 0), 8),
+    ('GRID', (0, 0), (-1, -1), 0.5, HexColor('#c5cae9')),
+    ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+    ('FONTSIZE', (0, 1), (-1, -1), 8),
+    ('ALIGN', (0, 1), (-1, -1), 'LEFT'),
+    ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+    ('TOPPADDING', (0, 1), (-1, -1), 6),
+    ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
+    ('LEFTPADDING', (0, 0), (-1, -1), 8),
+    ('RIGHTPADDING', (0, 0), (-1, -1), 8),
+    ('WORDWRAP', (0, 1), (-1, -1), True),
+]))
 elements.append(business_table)
 
 elements.append(spacer(3))

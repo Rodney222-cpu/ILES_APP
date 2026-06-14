@@ -33,6 +33,12 @@ class CustomUser(AbstractUser):
         null=True,
         unique=True
         )
+    company_name = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        help_text="Company name for workplace supervisors"
+        )
     
 
     def clean(self):
@@ -62,6 +68,13 @@ class CustomUser(AbstractUser):
             if self.student_number:
                 raise ValidationError({
                     "student_number": "Supervisor cannot have a student number"
+                })
+        
+        # WORKPLACE SUPERVISOR SPECIFIC RULES
+        if self.role == "workplace_supervisor":
+            if not self.company_name:
+                raise ValidationError({
+                    "company_name": "Workplace supervisor must have a company name"
                 })
 
         # ADMIN 

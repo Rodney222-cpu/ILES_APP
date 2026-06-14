@@ -35,9 +35,18 @@ class InternshipPlacementViewSet(viewsets.ModelViewSet):
             return InternshipPlacement.objects.filter(student=user)
 
         if user.role == "workplace_supervisor":
-            return InternshipPlacement.objects.filter(workplace_supervisor=user)
+            # Workplace supervisor can only see placements from their company
+            if user.company_name:
+                return InternshipPlacement.objects.filter(
+                    workplace_supervisor=user,
+                    company_name__iexact=user.company_name  # Case-insensitive match
+                )
+            else:
+                # If no company assigned, only show placements assigned to them
+                return InternshipPlacement.objects.filter(workplace_supervisor=user)
 
         if user.role == "academic_supervisor":
+            # Academic supervisors can see students from any company
             return InternshipPlacement.objects.filter(academic_supervisor=user)
 
         if user.role == "admin":
@@ -211,6 +220,13 @@ class InternshipPlacementViewSet(viewsets.ModelViewSet):
             supervisor = User.objects.get(id=workplace_supervisor_id, role='workplace_supervisor')
         except User.DoesNotExist:
             raise ValidationError({'workplace_supervisor_id': 'Invalid workplace supervisor.'})
+        
+        # Validate that supervisor's company matches placement's company
+        if supervisor.company_name:
+            if supervisor.company_name.lower().strip() != placement.company_name.lower().strip():
+                raise ValidationError({
+                    'workplace_supervisor_id': f'This supervisor works at "{supervisor.company_name}" but the placement is at "{placement.company_name}". Please select a supervisor from the same company.'
+                })
         
         placement.workplace_supervisor = supervisor
         if not placement.academic_supervisor:
