@@ -17,6 +17,7 @@ function AdminDashboard() {
   const [selectedSupervisor, setSelectedSupervisor] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const fetchPlacements = async () => {
     try {
@@ -86,8 +87,28 @@ function AdminDashboard() {
   };
 
   const handleApprove = async () => {
+    console.log('Approve button clicked for placement:', selectedPlacement?.id);
+    
+    if (!selectedPlacement || !selectedPlacement.id) {
+      setError('Invalid placement selected');
+      return;
+    }
+    
+    if (isProcessing) {
+      console.log('Already processing, ignoring duplicate click');
+      return;
+    }
+    
     try {
+      setIsProcessing(true);
+      setError(''); // Clear any previous errors
+      console.log('Sending approval request...', {
+        placementId: selectedPlacement.id,
+        adminComment: adminComment
+      });
+      
       const response = await approvePlacement(selectedPlacement.id, { admin_comment: adminComment });
+      console.log('Approval response:', response);
       
       // Optimistic update: immediately move placement from pending to approved
       const approvedPlacement = response.data?.placement || {
@@ -116,7 +137,22 @@ function AdminDashboard() {
       }
     } catch (err) {
       console.error('Approve placement error:', err);
-      setError('Failed to approve placement');
+      console.error('Error details:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
+      
+      // Show detailed error message
+      const errorMessage = err.response?.data?.detail 
+        || err.response?.data?.message 
+        || err.response?.data?.admin_comment?.[0]
+        || err.message 
+        || 'Failed to approve placement. Please try again.';
+      
+      setError(errorMessage);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -125,7 +161,15 @@ function AdminDashboard() {
       setError('Please provide a reason for rejection');
       return;
     }
+    
+    if (isProcessing) {
+      return;
+    }
+    
     try {
+      setIsProcessing(true);
+      setError('');
+      
       await rejectPlacement(selectedPlacement.id, { admin_comment: adminComment });
       
       // Optimistic update: remove from pending placements
@@ -147,7 +191,12 @@ function AdminDashboard() {
       }
     } catch (err) {
       console.error('Reject placement error:', err);
-      setError('Failed to reject placement');
+      const errorMessage = err.response?.data?.detail 
+        || err.response?.data?.message 
+        || 'Failed to reject placement';
+      setError(errorMessage);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -617,18 +666,28 @@ function AdminDashboard() {
               {/* Action Forms */}
               {modalType === 'approve' && (
                 <div className={styles.actionForm}>
+                  {error && <div className={styles.errorAlert} style={{marginBottom: '1rem'}}>{error}</div>}
                   <label>Comment (Optional)</label>
                   <textarea
                     value={adminComment}
                     onChange={(e) => setAdminComment(e.target.value)}
                     placeholder="Add any comments..."
                     rows="3"
+                    disabled={isProcessing}
                   />
                   <div className={styles.actionFormButtons}>
-                    <button className={styles.btnApprove} onClick={handleApprove}>
-                      Confirm Approval
+                    <button 
+                      className={styles.btnApprove} 
+                      onClick={handleApprove}
+                      disabled={isProcessing}
+                    >
+                      {isProcessing ? 'Processing...' : 'Confirm Approval'}
                     </button>
-                    <button className={styles.btnCancel} onClick={closeModal}>
+                    <button 
+                      className={styles.btnCancel} 
+                      onClick={closeModal}
+                      disabled={isProcessing}
+                    >
                       Cancel
                     </button>
                   </div>
@@ -637,6 +696,7 @@ function AdminDashboard() {
 
               {modalType === 'reject' && (
                 <div className={styles.actionForm}>
+                  {error && <div className={styles.errorAlert} style={{marginBottom: '1rem'}}>{error}</div>}
                   <label>Reason for Rejection *</label>
                   <textarea
                     value={adminComment}
@@ -644,12 +704,21 @@ function AdminDashboard() {
                     placeholder="Please provide a reason..."
                     rows="3"
                     required
+                    disabled={isProcessing}
                   />
                   <div className={styles.actionFormButtons}>
-                    <button className={styles.btnReject} onClick={handleReject}>
-                      Confirm Rejection
+                    <button 
+                      className={styles.btnReject} 
+                      onClick={handleReject}
+                      disabled={isProcessing}
+                    >
+                      {isProcessing ? 'Processing...' : 'Confirm Rejection'}
                     </button>
-                    <button className={styles.btnCancel} onClick={closeModal}>
+                    <button 
+                      className={styles.btnCancel} 
+                      onClick={closeModal}
+                      disabled={isProcessing}
+                    >
                       Cancel
                     </button>
                   </div>
