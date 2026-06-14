@@ -169,8 +169,216 @@ function WorkplaceSupervisorDashboard() {
         </button>
       </div>
 
+      {/* Tabs for different sections */}
+      <div className={styles.tabsContainer}>
+        <button
+          className={`${styles.tab} ${activeTab === 'pending' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('pending')}
+        >
+          Pending Review ({logs.filter(l => l.status === 'SUBMITTED').length})
+        </button>
+        <button
+          className={`${styles.tab} ${activeTab === 'authorized' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('authorized')}
+        >
+          Authorized ({logs.filter(l => ['AUTHORIZED', 'PENDING_EVALUATION', 'EVALUATED'].includes(l.status)).length})
+        </button>
+        <button
+          className={`${styles.tab} ${activeTab === 'all' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('all')}
+        >
+          All Reviewed ({logs.filter(l => l.workplace_supervisor_comment).length})
+        </button>
+      </div>
+
       {message && <div className={styles.successAlert}>{message}</div>}
       {error && <div className={styles.errorAlert}>{error}</div>}
+
+      {/* Pending Review Section */}
+      {activeTab === 'pending' && (
+        <div className={styles.section}>
+          <h3>Pending Review</h3>
+          {logs.filter(l => l.status === 'SUBMITTED').length === 0 ? (
+            <p className={styles.emptyState}>No logs awaiting review</p>
+          ) : (
+            <div className={styles.placementsGrid}>
+              {logs.filter(l => l.status === 'SUBMITTED').map((log) => (
+                <div key={log.id} className={styles.placementCard} onClick={() => openLogModal(log)}>
+                  <div className={styles.placementHeader}>
+                    <div className={styles.avatar}>
+                      {log.student_username?.charAt(0).toUpperCase() || 'S'}
+                    </div>
+                    <div>
+                      <div className={styles.studentName}>{log.student_username}</div>
+                      <div className={styles.weekInfo}>Week {log.week_number} • {log.log_date}</div>
+                    </div>
+                  </div>
+                  <div className={styles.placementInfo}>
+                    <div className={styles.infoRow}>
+                      <span>Hours:</span>
+                      <span>{log.hours_spent}h</span>
+                    </div>
+                    <div className={styles.infoRow}>
+                      <span>Status:</span>
+                      <span className={`${styles.statusBadge} ${styles.submitted}`}>
+                        Awaiting Review
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Authorized Section */}
+      {activeTab === 'authorized' && (
+        <div className={styles.section}>
+          <h3>Authorized Logs</h3>
+          {logs.filter(l => ['AUTHORIZED', 'PENDING_EVALUATION', 'EVALUATED'].includes(l.status)).length === 0 ? (
+            <p className={styles.emptyState}>No authorized logs yet</p>
+          ) : (
+            <div className={styles.tableContainer}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Week</th>
+                    <th>Date</th>
+                    <th>Hours</th>
+                    <th>My Review</th>
+                    <th>Review Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {logs.filter(l => ['AUTHORIZED', 'PENDING_EVALUATION', 'EVALUATED'].includes(l.status)).map((log) => (
+                    <tr key={log.id}>
+                      <td>{log.student_username}</td>
+                      <td><strong>Week {log.week_number}</strong></td>
+                      <td>{log.log_date}</td>
+                      <td>{log.hours_spent}h</td>
+                      <td>
+                        <div className={styles.reviewPreview}>
+                          {log.workplace_supervisor_comment?.substring(0, 50)}
+                          {log.workplace_supervisor_comment?.length > 50 ? '...' : ''}
+                        </div>
+                      </td>
+                      <td>
+                        {log.workplace_review_date 
+                          ? new Date(log.workplace_review_date).toLocaleDateString()
+                          : '-'
+                        }
+                      </td>
+                      <td>
+                        <span className={`${styles.statusBadge} ${
+                          log.status === 'EVALUATED' ? styles.evaluated :
+                          log.status === 'PENDING_EVALUATION' ? styles.pending_evaluation :
+                          styles.authorized
+                        }`}>
+                          {log.status === 'EVALUATED' ? 'Evaluated' :
+                           log.status === 'PENDING_EVALUATION' ? 'With Academic' :
+                           'Authorized'}
+                        </span>
+                      </td>
+                      <td>
+                        <button
+                          className={styles.viewBtn}
+                          onClick={() => openLogModal(log)}
+                        >
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* All Reviewed Section */}
+      {activeTab === 'all' && (
+        <div className={styles.section}>
+          <h3>Complete Review History</h3>
+          {logs.filter(l => l.workplace_supervisor_comment).length === 0 ? (
+            <p className={styles.emptyState}>No reviewed logs yet</p>
+          ) : (
+            <div className={styles.tableContainer}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Week</th>
+                    <th>Date</th>
+                    <th>Hours</th>
+                    <th>My Review</th>
+                    <th>Review Date</th>
+                    <th>Current Status</th>
+                    <th>Academic Marks</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {logs.filter(l => l.workplace_supervisor_comment).map((log) => (
+                    <tr key={log.id}>
+                      <td>{log.student_username}</td>
+                      <td><strong>Week {log.week_number}</strong></td>
+                      <td>{log.log_date}</td>
+                      <td>{log.hours_spent}h</td>
+                      <td>
+                        <div className={styles.reviewPreview}>
+                          {log.workplace_supervisor_comment?.substring(0, 50)}
+                          {log.workplace_supervisor_comment?.length > 50 ? '...' : ''}
+                        </div>
+                      </td>
+                      <td>
+                        {log.workplace_review_date 
+                          ? new Date(log.workplace_review_date).toLocaleDateString()
+                          : '-'
+                        }
+                      </td>
+                      <td>
+                        <span className={`${styles.statusBadge} ${
+                          log.status === 'EVALUATED' ? styles.evaluated :
+                          log.status === 'PENDING_EVALUATION' ? styles.pending_evaluation :
+                          styles.authorized
+                        }`}>
+                          {log.status?.replace(/_/g, ' ')}
+                        </span>
+                      </td>
+                      <td>
+                        {log.marks_awarded !== null && log.marks_awarded !== undefined ? (
+                          <strong className={`${styles.marksBadge} ${
+                            log.marks_awarded >= 75 ? styles.marksExcellent :
+                            log.marks_awarded >= 50 ? styles.marksGood :
+                            styles.marksPoor
+                          }`}>
+                            {log.marks_awarded}/100
+                          </strong>
+                        ) : (
+                          <span className={styles.noMarks}>Not yet</span>
+                        )}
+                      </td>
+                      <td>
+                        <button
+                          className={styles.viewBtn}
+                          onClick={() => openLogModal(log)}
+                        >
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className={styles.tableContainer}>
         <table className={styles.table}>

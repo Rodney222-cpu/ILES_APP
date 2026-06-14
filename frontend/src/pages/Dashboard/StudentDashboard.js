@@ -97,24 +97,43 @@ function StudentDashboard() {
 
   const totalLogs = logs.length;
   const pendingLogs = logs.filter((log) =>
-    ["DRAFT", "SUBMITTED", "PENDING", "REVIEWED"].includes(
+    ["DRAFT", "SUBMITTED", "PENDING_EVALUATION", "AUTHORIZED"].includes(
       String(log.status || "").toUpperCase()
     )
   ).length;
-  const approvedLogs = logs.filter(
-    (log) => String(log.status || "").toUpperCase() === "APPROVED"
+  const evaluatedLogs = logs.filter(
+    (log) => String(log.status || "").toUpperCase() === "EVALUATED"
   ).length;
+  
+  // Calculate average marks
+  const logsWithMarks = logs.filter(log => log.marks_awarded !== null && log.marks_awarded !== undefined);
+  const averageMarks = logsWithMarks.length > 0 
+    ? (logsWithMarks.reduce((sum, log) => sum + parseFloat(log.marks_awarded || 0), 0) / logsWithMarks.length).toFixed(1)
+    : 0;
 
   const totalPages = Math.max(1, Math.ceil(totalLogs / PAGE_SIZE));
   const start = (currentPage - 1) * PAGE_SIZE;
   const paginatedLogs = logs.slice(start, start + PAGE_SIZE);
 
   const statusClassMap = {
-    APPROVED: styles.approved,
-    REVIEWED: styles.reviewed,
+    EVALUATED: styles.approved,
+    PENDING_EVALUATION: styles.reviewed,
+    AUTHORIZED: styles.authorized,
     SUBMITTED: styles.pending,
-    DRAFT: styles.pending,
-    PENDING: styles.pending,
+    DRAFT: styles.draft,
+  };
+
+  const [selectedLog, setSelectedLog] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+
+  const openLogDetail = (log) => {
+    setSelectedLog(log);
+    setShowDetailModal(true);
+  };
+
+  const closeDetailModal = () => {
+    setSelectedLog(null);
+    setShowDetailModal(false);
   };
 
   return (
@@ -186,8 +205,12 @@ function StudentDashboard() {
             <p className={styles.cardLabel}>Pending Reviews</p>
           </div>
           <div className={`${styles.card} ${styles.blue}`}>
-            <p className={styles.cardValue}>{approvedLogs}</p>
-            <p className={styles.cardLabel}>Approved Logs</p>
+            <p className={styles.cardValue}>{evaluatedLogs}</p>
+            <p className={styles.cardLabel}>Evaluated Logs</p>
+          </div>
+          <div className={`${styles.card} ${styles.purple}`}>
+            <p className={styles.cardValue}>{averageMarks}%</p>
+            <p className={styles.cardLabel}>Average Marks</p>
           </div>
         </div>
       )}
@@ -201,31 +224,83 @@ function StudentDashboard() {
           <table className={styles.table}>
             <thead>
               <tr>
+                <th>Week</th>
                 <th>Date</th>
-                <th>Description</th>
                 <th>Hours</th>
                 <th>Status</th>
-                <th>Supervisor Feedback</th>
+                <th>Workplace Review</th>
+                <th>Academic Evaluation</th>
+                <th>Marks</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {paginatedLogs.map((log) => {
-                const status = String(log.status || "PENDING").toUpperCase();
+                const status = String(log.status || "DRAFT").toUpperCase();
                 return (
                   <tr key={log.id}>
+                    <td><strong>Week {log.week_number}</strong></td>
                     <td>{log.log_date || "-"}</td>
-                    <td>{log.description || "-"}</td>
-                    <td>{log.hours_spent || 0}</td>
+                    <td>{log.hours_spent || 0}h</td>
                     <td>
                       <span
                         className={`${styles.statusBadge} ${
                           statusClassMap[status] || styles.pending
                         }`}
                       >
-                        {status}
+                        {status.replace(/_/g, ' ')}
                       </span>
                     </td>
-                    <td>{log.supervisor_comment || "-"}</td>
+                    <td>
+                      {log.workplace_supervisor_comment ? (
+                        <div className={styles.feedbackPreview}>
+                          <span className={styles.feedbackIcon}>✓</span>
+                          <span className={styles.feedbackText}>
+                            {log.workplace_supervisor_comment.substring(0, 50)}
+                            {log.workplace_supervisor_comment.length > 50 ? '...' : ''}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className={styles.noFeedback}>Not reviewed</span>
+                      )}
+                    </td>
+                    <td>
+                      {log.academic_supervisor_comment ? (
+                        <div className={styles.feedbackPreview}>
+                          <span className={styles.feedbackIcon}>✓</span>
+                          <span className={styles.feedbackText}>
+                            {log.academic_supervisor_comment.substring(0, 50)}
+                            {log.academic_supervisor_comment.length > 50 ? '...' : ''}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className={styles.noFeedback}>Not evaluated</span>
+                      )}
+                    </td>
+                    <td>
+                      {log.marks_awarded !== null && log.marks_awarded !== undefined ? (
+                        <div className={styles.marksDisplay}>
+                          <strong className={`${styles.marksBadge} ${
+                            log.marks_awarded >= 75 ? styles.marksExcellent :
+                            log.marks_awarded >= 50 ? styles.marksGood :
+                            styles.marksPoor
+                          }`}>
+                            {log.marks_awarded}/100
+                          </strong>
+                        </div>
+                      ) : (
+                        <span className={styles.noMarks}>-</span>
+                      )}
+                    </td>
+                    <td>
+                      <button
+                        type="button"
+                        className={styles.viewDetailsBtn}
+                        onClick={() => openLogDetail(log)}
+                      >
+                        View Details
+                      </button>
+                    </td>
                   </tr>
                 );
               })}
@@ -263,6 +338,120 @@ function StudentDashboard() {
               >
                 Next
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Log Detail Modal */}
+      {showDetailModal && selectedLog && (
+        <div className={styles.modalOverlay} onClick={closeDetailModal}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2>Week {selectedLog.week_number} - Log Details</h2>
+              <button className={styles.closeBtn} onClick={closeDetailModal}>×</button>
+            </div>
+            <div className={styles.modalBody}>
+              {/* Basic Info */}
+              <div className={styles.detailSection}>
+                <h3>Log Information</h3>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Week Number:</span>
+                  <span className={styles.detailValue}>Week {selectedLog.week_number}</span>
+                </div>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Submission Date:</span>
+                  <span className={styles.detailValue}>{selectedLog.log_date}</span>
+                </div>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Hours Worked:</span>
+                  <span className={styles.detailValue}>{selectedLog.hours_spent} hours</span>
+                </div>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Status:</span>
+                  <span className={`${styles.statusBadge} ${statusClassMap[selectedLog.status?.toUpperCase()]}`}>
+                    {selectedLog.status?.replace(/_/g, ' ').toUpperCase()}
+                  </span>
+                </div>
+              </div>
+
+              {/* Activities */}
+              <div className={styles.detailSection}>
+                <h3>Activities Performed</h3>
+                <p className={styles.detailText}>{selectedLog.activities || 'No activities recorded'}</p>
+              </div>
+
+              {/* Challenges */}
+              <div className={styles.detailSection}>
+                <h3>Challenges Faced</h3>
+                <p className={styles.detailText}>{selectedLog.challenges || 'No challenges recorded'}</p>
+              </div>
+
+              {/* Learning */}
+              <div className={styles.detailSection}>
+                <h3>Learning Outcomes</h3>
+                <p className={styles.detailText}>{selectedLog.learning || 'No learning outcomes recorded'}</p>
+              </div>
+
+              {/* Workplace Supervisor Review */}
+              {selectedLog.workplace_supervisor_comment && (
+                <div className={styles.detailSection}>
+                  <h3>Workplace Supervisor Review</h3>
+                  <p className={styles.feedbackText}>{selectedLog.workplace_supervisor_comment}</p>
+                  {selectedLog.workplace_reviewer_name && (
+                    <p className={styles.reviewerInfo}>
+                      <strong>Reviewed by:</strong> {selectedLog.workplace_reviewer_name}
+                    </p>
+                  )}
+                  {selectedLog.workplace_review_date && (
+                    <p className={styles.reviewerInfo}>
+                      <strong>Review Date:</strong> {new Date(selectedLog.workplace_review_date).toLocaleDateString()}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Academic Supervisor Evaluation */}
+              {selectedLog.academic_supervisor_comment && (
+                <div className={styles.detailSection}>
+                  <h3>Academic Supervisor Evaluation</h3>
+                  <p className={styles.feedbackText}>{selectedLog.academic_supervisor_comment}</p>
+                  {selectedLog.academic_evaluator_name && (
+                    <p className={styles.reviewerInfo}>
+                      <strong>Evaluated by:</strong> {selectedLog.academic_evaluator_name}
+                    </p>
+                  )}
+                  {selectedLog.academic_evaluation_date && (
+                    <p className={styles.reviewerInfo}>
+                      <strong>Evaluation Date:</strong> {new Date(selectedLog.academic_evaluation_date).toLocaleDateString()}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Marks Awarded */}
+              {selectedLog.marks_awarded !== null && selectedLog.marks_awarded !== undefined && (
+                <div className={styles.detailSection}>
+                  <h3>Marks Awarded</h3>
+                  <div className={styles.marksDisplayLarge}>
+                    <span className={`${styles.marksBadgeLarge} ${
+                      selectedLog.marks_awarded >= 75 ? styles.marksExcellent :
+                      selectedLog.marks_awarded >= 50 ? styles.marksGood :
+                      styles.marksPoor
+                    }`}>
+                      {selectedLog.marks_awarded}/100
+                    </span>
+                    <span className={styles.marksPerformance}>
+                      {selectedLog.marks_awarded >= 75 ? 'Excellent Performance' :
+                       selectedLog.marks_awarded >= 50 ? 'Good Performance' :
+                       'Needs Improvement'}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className={styles.modalFooter}>
+              <button className={styles.btnClose} onClick={closeDetailModal}>Close</button>
             </div>
           </div>
         </div>
