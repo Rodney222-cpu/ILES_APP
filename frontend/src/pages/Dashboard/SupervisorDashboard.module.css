@@ -459,3 +459,302 @@
 .evaluateBtn:hover {
   background: #1a252f;
 }
+
+/* Modal Styles */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.modal {
+  background: white;
+  border-radius: 12px;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 2px solid #e5e7eb;
+  background: linear-gradient(135deg, #4a6fa5 0%, #2d5a8f 100%);
+  color: white;
+  border-radius: 12px 12px 0 0;
+}
+
+.modalHeader h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.closeBtn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.modalBody {
+  padding: 2rem;
+}
+
+.detailsSection {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.detailsSection:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.detailsSection h3 {
+  margin: 0 0 1rem 0;
+  color: #1f2937;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+.detailLabel {
+  font-weight: 600;
+  color: #6b7280;
+  min-width: 140px;
+}
+
+.detailContent {
+  color: #374151;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  background: #f9fafb;
+  padding: 1rem;
+  border-radius: 6px;
+  border-left: 3px solid #4a6fa5;
+}
+
+.existingComment {
+  background: #f0f9ff;
+  padding: 1rem;
+  border-radius: 6px;
+  border-left: 3px solid #3b82f6;
+  color: #1e40af;
+  line-height: 1.6;
+}
+
+.attachmentLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: #f0f9ff;
+  color: #1e40af;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s;
+  border: 1px solid #bfdbfe;
+}
+
+.attachmentLink:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.marksAwarded {
+  font-weight: 700;
+  color: #059669;
+  font-size: 1.1rem;
+}
+
+/* Authorization Section */
+.authorizationSection {
+  background: #fef3c7;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 2px solid #fbbf24;
+}
+
+.authorizationSection h3 {
+  margin: 0 0 1rem 0;
+  color: #92400e;
+}
+
+.authNote {
+  background: white;
+  padding: 1rem;
+  border-radius: 6px;
+  color: #78350f;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  border-left: 3px solid #f59e0b;
+}
+
+.formLabel {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.95rem;
+}
+
+.required {
+  color: #ef4444;
+  margin-left: 0.25rem;
+}
+
+.reviewTextarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 0.875rem;
+  border: 2px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.2s;
+  background: white;
+}
+
+.reviewTextarea:focus {
+  outline: none;
+  border-color: #4a6fa5;
+  box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.1);
+}
+
+.reviewTextarea::placeholder {
+  color: #9ca3af;
+}
+
+/* Modal Actions */
+.modalActions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btn {
+  flex: 1;
+  padding: 0.875rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnAuthorize {
+  background: #10b981;
+  color: white;
+}
+
+.btnAuthorize:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btnCancel {
+  background: #6b7280;
+  color: white;
+}
+
+.btnCancel:hover {
+  background: #4b5563;
+}
+
+.viewBtn {
+  background: #3b82f6;
+  color: white;
+}
+
+.viewBtn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+/* Responsive Modal */
+@media (max-width: 768px) {
+  .modal {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .modalHeader {
+    border-radius: 0;
+  }
+
+  .modalBody {
+    padding: 1.5rem;
+  }
+
+  .detailRow {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .detailLabel {
+    min-width: unset;
+  }
+
+  .modalActions {
+    flex-direction: column;
+  }
+}

@@ -9,6 +9,9 @@ function WorkplaceSupervisorDashboard() {
   const [feedback, setFeedback] = useState({});
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [selectedLog, setSelectedLog] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [reviewComment, setReviewComment] = useState("");
 
   const fetchPlacements = async () => {
     try {
@@ -60,6 +63,44 @@ function WorkplaceSupervisorDashboard() {
         setError(msg);
       } else {
         setError("Failed to update log.");
+      }
+    }
+  };
+
+  const openLogModal = (log) => {
+    setSelectedLog(log);
+    setReviewComment(log.workplace_supervisor_comment || log.supervisor_comment || "");
+    setShowModal(true);
+    setError("");
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedLog(null);
+    setReviewComment("");
+    setError("");
+  };
+
+  const handleAuthorizeFromModal = async () => {
+    if (!reviewComment.trim()) {
+      setError("Please enter your review comments before authorizing.");
+      return;
+    }
+
+    try {
+      await reviewWeeklyLog(selectedLog.id, {
+        status: "AUTHORIZED",
+        workplace_supervisor_comment: reviewComment,
+      });
+      setMessage("Log authorized successfully!");
+      closeModal();
+      fetchLogs();
+    } catch (err) {
+      if (err.response?.data) {
+        const msg = Object.values(err.response.data).flat().join(", ");
+        setError(msg);
+      } else {
+        setError("Failed to authorize log.");
       }
     }
   };
@@ -205,18 +246,30 @@ function WorkplaceSupervisorDashboard() {
                   <td>
                     <div className={styles.actionButtons}>
                       {log.status === "SUBMITTED" ? (
-                        <button
-                          type="button"
-                          className={`${styles.actionBtn} ${styles.reviewBtn}`}
-                          onClick={() => handleDecision(log.id, "AUTHORIZED")}
-                          title="Review and authorize for Academic Supervisor"
-                        >
-                          Review Log
-                        </button>
+                        <>
+                          <button
+                            type="button"
+                            className={`${styles.actionBtn} ${styles.viewBtn}`}
+                            onClick={() => openLogModal(log)}
+                            title="View full log details"
+                          >
+                            View & Authorize
+                          </button>
+                        </>
                       ) : (
-                        <span className={styles.statusBadge}>
-                          {log.status}
-                        </span>
+                        <>
+                          <button
+                            type="button"
+                            className={`${styles.actionBtn} ${styles.viewBtn}`}
+                            onClick={() => openLogModal(log)}
+                            title="View log details"
+                          >
+                            View Details
+                          </button>
+                          <span className={styles.statusBadge}>
+                            {log.status}
+                          </span>
+                        </>
                       )}
                     </div>
                   </td>
@@ -226,6 +279,163 @@ function WorkplaceSupervisorDashboard() {
           </tbody>
         </table>
       </div>
+
+      {/* Log Details Modal */}
+      {showModal && selectedLog && (
+        <div className={styles.modalOverlay} onClick={closeModal}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2>Weekly Log - Week {selectedLog.week_number}</h2>
+              <button className={styles.closeBtn} onClick={closeModal}>×</button>
+            </div>
+
+            <div className={styles.modalBody}>
+              {/* Student Info */}
+              <div className={styles.detailsSection}>
+                <h3>Student Information</h3>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Student:</span>
+                  <span>{selectedLog.student_username}</span>
+                </div>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Week Number:</span>
+                  <span>{selectedLog.week_number}</span>
+                </div>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Date:</span>
+                  <span>{selectedLog.log_date}</span>
+                </div>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Hours Spent:</span>
+                  <span>{selectedLog.hours_spent} hours</span>
+                </div>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Status:</span>
+                  <span className={`${styles.statusBadge} ${styles[(selectedLog.status || "").toLowerCase()]}`}>
+                    {selectedLog.status}
+                  </span>
+                </div>
+              </div>
+
+              {/* Log Content */}
+              <div className={styles.detailsSection}>
+                <h3>Activities Performed</h3>
+                <div className={styles.detailContent}>
+                  {selectedLog.activities || selectedLog.description || "No activities recorded"}
+                </div>
+              </div>
+
+              {selectedLog.challenges && (
+                <div className={styles.detailsSection}>
+                  <h3>Challenges Faced</h3>
+                  <div className={styles.detailContent}>
+                    {selectedLog.challenges}
+                  </div>
+                </div>
+              )}
+
+              {selectedLog.learning && (
+                <div className={styles.detailsSection}>
+                  <h3>Learning Outcomes</h3>
+                  <div className={styles.detailContent}>
+                    {selectedLog.learning}
+                  </div>
+                </div>
+              )}
+
+              {selectedLog.attachment && (
+                <div className={styles.detailsSection}>
+                  <h3>Attachment</h3>
+                  <a 
+                    href={selectedLog.attachment} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className={styles.attachmentLink}
+                  >
+                    📎 View Attachment
+                  </a>
+                </div>
+              )}
+
+              {/* Existing Comments */}
+              {selectedLog.workplace_supervisor_comment && (
+                <div className={styles.detailsSection}>
+                  <h3>Previous Workplace Review</h3>
+                  <div className={styles.existingComment}>
+                    {selectedLog.workplace_supervisor_comment}
+                  </div>
+                </div>
+              )}
+
+              {selectedLog.academic_supervisor_comment && (
+                <div className={styles.detailsSection}>
+                  <h3>Academic Supervisor Feedback</h3>
+                  <div className={styles.existingComment}>
+                    {selectedLog.academic_supervisor_comment}
+                  </div>
+                  {selectedLog.marks_awarded !== null && selectedLog.marks_awarded !== undefined && (
+                    <div className={styles.detailRow}>
+                      <span className={styles.detailLabel}>Marks Awarded:</span>
+                      <span className={styles.marksAwarded}>{selectedLog.marks_awarded}%</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Authorization Form */}
+              {selectedLog.status === "SUBMITTED" && (
+                <div className={styles.authorizationSection}>
+                  <h3>Workplace Supervisor Authorization</h3>
+                  {error && <div className={styles.errorAlert}>{error}</div>}
+                  <p className={styles.authNote}>
+                    Review the student's log and provide your comments. Authorizing this log will allow the student to submit it to their academic supervisor for evaluation.
+                  </p>
+                  <label className={styles.formLabel}>
+                    Your Review Comments <span className={styles.required}>*</span>
+                  </label>
+                  <textarea
+                    value={reviewComment}
+                    onChange={(e) => setReviewComment(e.target.value)}
+                    placeholder="Enter your feedback about the student's work this week..."
+                    rows="5"
+                    className={styles.reviewTextarea}
+                    required
+                  />
+                  <div className={styles.modalActions}>
+                    <button
+                      type="button"
+                      className={`${styles.btn} ${styles.btnAuthorize}`}
+                      onClick={handleAuthorizeFromModal}
+                    >
+                      Authorize Log
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.btn} ${styles.btnCancel}`}
+                      onClick={closeModal}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* View Only for Already Authorized/Reviewed Logs */}
+              {selectedLog.status !== "SUBMITTED" && (
+                <div className={styles.modalActions}>
+                  <button
+                    type="button"
+                    className={`${styles.btn} ${styles.btnCancel}`}
+                    onClick={closeModal}
+                  >
+                    Close
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
