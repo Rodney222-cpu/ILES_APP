@@ -420,88 +420,311 @@ elements.append(body("[Screenshot 7: Placement Status View] - Student view of pl
 
 elements.append(PageBreak())
 
-# --- MODULE 3: Weekly Logbook ---
-elements.append(heading2("2.3 Weekly Logbook Module"))
+# --- MODULE 3: Weekly Logbook with Multi-Stage Workflow ---
+elements.append(heading2("2.3 Weekly Logbook Module - Three-Stage Workflow"))
 elements.append(spacer(5))
 
 elements.append(heading3("Technical Overview"))
 elements.append(body(
-    "The Weekly Logbook module allows students to submit weekly internship logs documenting their activities, "
-    "hours spent, challenges faced, and lessons learned. Each log is linked to a student's active placement "
-    "and goes through a two-tier review workflow. The workplace supervisor reviews first, adds their name "
-    "and comment, then authorizes the log to proceed to the academic supervisor for further review and evaluation. "
-    "When the log reaches the academic supervisor, it already contains the workplace supervisor's name and comments."
+    "<b>IMPORTANT: Three-Stage Mandatory Workflow Implementation</b><br/><br/>"
+    "The Weekly Logbook module implements a mandatory three-stage workflow that enforces proper review "
+    "and evaluation sequences. The workflow ensures that:<br/>"
+    "1. Students MUST submit logs to workplace supervisors first<br/>"
+    "2. Workplace supervisors MUST review and authorize logs before academic submission<br/>"
+    "3. Students (NOT workplace supervisors) submit authorized logs to academic supervisors<br/>"
+    "4. Academic supervisors evaluate logs with workplace remarks already attached<br/><br/>"
+    "This implementation prevents students from bypassing workplace review and ensures both "
+    "practical (workplace) and academic oversight of internship progress."
 ))
 
-elements.append(heading3("Database Model"))
-elements.append(Paragraph("<b>WeeklyLogModel</b>", code_style))
-elements.append(Paragraph("fields: placement (FK), log_date, description, hours_spent, attachment (file), activities", code_style))
-elements.append(Paragraph("fields: challenges, learning, week_number, supervisor_comment, deadline", code_style))
-elements.append(Paragraph("fields: status (DRAFT | SUBMITTED | REVIEWED | APPROVED | REJECTED)", code_style))
-elements.append(Paragraph("fields: submitted_at, created_at, updated_at", code_style))
-elements.append(Paragraph("Meta: unique_together = [placement, week_number]", code_style))
+elements.append(heading3("Database Model - Enhanced for Multi-Stage Workflow"))
+elements.append(Paragraph("<b>WeeklyLogModel</b> - Updated Schema", code_style))
+elements.append(Paragraph("Core fields: placement (FK), week_number, log_date, hours_spent, activities", code_style))
+elements.append(Paragraph("fields: description, challenges, learning, attachment (file), deadline", code_style))
+elements.append(spacer(2))
+elements.append(Paragraph("<b>Status Flow:</b>", code_style))
+elements.append(Paragraph("  DRAFT → SUBMITTED → AUTHORIZED → PENDING_EVALUATION → EVALUATED", code_style))
+elements.append(spacer(2))
+elements.append(Paragraph("<b>Workplace Review Fields:</b>", code_style))
+elements.append(Paragraph("  workplace_reviewer_name, workplace_review_date, workplace_supervisor_comment", code_style))
+elements.append(spacer(2))
+elements.append(Paragraph("<b>Academic Evaluation Fields:</b>", code_style))
+elements.append(Paragraph("  academic_evaluator_name, academic_evaluation_date, academic_supervisor_comment", code_style))
+elements.append(Paragraph("  marks_awarded (Decimal) - Only awarded by academic supervisor", code_style))
+elements.append(spacer(2))
+elements.append(Paragraph("<b>Computed Properties for Workflow Control:</b>", code_style))
+elements.append(Paragraph("  @property can_submit_to_workplace: status == 'DRAFT'", code_style))
+elements.append(Paragraph("  @property can_submit_to_academic: status == 'AUTHORIZED' AND is_authorized", code_style))
+elements.append(Paragraph("  @property can_workplace_review: status == 'SUBMITTED'", code_style))
+elements.append(Paragraph("  @property can_academic_evaluate: status == 'PENDING_EVALUATION' AND is_authorized", code_style))
+elements.append(Paragraph("  @property workflow_stage: returns 1-5 indicating current stage", code_style))
+elements.append(Paragraph("  @property is_complete: status == 'EVALUATED'", code_style))
+elements.append(spacer(2))
+elements.append(Paragraph("Meta: unique_together = [placement, week_number], ordering = ['-week_number']", code_style))
 
 elements.append(spacer(3))
-elements.append(heading3("API Endpoints"))
+elements.append(heading3("API Endpoints - Multi-Stage Workflow"))
 api_log_data = [
     ['Method', 'Endpoint', 'Description'],
-    ['GET', '/weeklylogs/weeklylogs/', 'List logs (role-filtered)'],
-    ['POST', '/weeklylogs/weeklylogs/', 'Create new weekly log (student only)'],
-    ['GET', '/weeklylogs/weeklylogs/{id}/', 'Get log details'],
+    ['GET', '/weeklylogs/weeklylogs/', 'List logs (role-filtered by status)'],
+    ['POST', '/weeklylogs/weeklylogs/', 'Create new log (auto-submit to workplace)'],
+    ['GET', '/weeklylogs/weeklylogs/{id}/', 'Get log details with workflow state'],
     ['PUT', '/weeklylogs/weeklylogs/{id}/', 'Update log (draft only)'],
-    ['POST', '/weeklylogs/weeklylogs/{id}/submit/', 'Submit draft log'],
-    ['POST', '/weeklylogs/weeklylogs/{id}/workplace_review/', 'Workplace supervisor review'],
-    ['POST', '/weeklylogs/weeklylogs/{id}/approve/', 'Academic supervisor approve'],
-    ['POST', '/weeklylogs/weeklylogs/{id}/decision/', 'Decision (approve/reject/review)'],
+    ['POST', '/weeklylogs/weeklylogs/{id}/authorize/', 'Workplace supervisor authorizes log'],
+    ['POST', '/weeklylogs/weeklylogs/{id}/submit_to_academic/', 'Student submits authorized log to academic'],
+    ['POST', '/weeklylogs/weeklylogs/{id}/evaluate/', 'Academic evaluates and awards marks'],
+    ['GET', '/weeklylogs/weeklylogs/student-dashboard/', 'Student dashboard with grouped logs'],
+    ['GET', '/weeklylogs/weeklylogs/workplace-dashboard/', 'Workplace supervisor dashboard'],
+    ['GET', '/weeklylogs/weeklylogs/academic-dashboard/', 'Academic supervisor dashboard'],
+    ['GET', '/weeklylogs/weeklylogs/workflow-stats/', 'Workflow statistics per role'],
 ]
-api_log_table = Table(api_log_data, colWidths=[70, 210, 220])
+api_log_table = Table(api_log_data, colWidths=[70, 230, 200])
 api_log_table.setStyle(TableStyle(table_header_row()))
 elements.append(api_log_table)
 
 elements.append(spacer(3))
-elements.append(heading3("Workflow"))
-elements.append(bullet("<b>Step 1:</b> Student submits a weekly log (auto-status: SUBMITTED)"))
-elements.append(bullet("<b>Step 2:</b> Workplace supervisor reviews the submitted log - adds their name, provides feedback comment"))
-elements.append(bullet("<b>Step 3:</b> Status changes to REVIEWED - log now contains workplace supervisor's name and comment"))
-elements.append(bullet("<b>Step 4:</b> Log is forwarded to the academic supervisor for further review and evaluation"))
-elements.append(bullet("<b>Step 5:</b> Academic supervisor evaluates the reviewed log (approves or rejects)"))
-elements.append(bullet("<b>Step 6:</b> Status changes to APPROVED upon academic approval, or REJECTED if rejected"))
-elements.append(bullet("<b>Step 7:</b> The academic supervisor sees the workplace supervisor's name and comments when evaluating"))
-elements.append(bullet("<b>Validation:</b> Hourly limit enforced: max 60 hours per week"))
+elements.append(heading3("Three-Stage Workflow - Detailed"))
+elements.append(spacer(2))
+
+# Create a workflow visualization
+workflow_box_style = ParagraphStyle(
+    'WorkflowBox',
+    parent=code_style,
+    fontSize=8,
+    leading=11,
+    leftIndent=20,
+    backColor=HexColor('#e8eaf6'),
+    borderPadding=8,
+)
+
+elements.append(Paragraph("<b>Stage 1: Student Submission to Workplace</b>", workflow_box_style))
+elements.append(bullet("Student creates weekly log with activities, hours, challenges, and learning outcomes"))
+elements.append(bullet("Upon creation, log status automatically changes to SUBMITTED"))
+elements.append(bullet("Log is sent to workplace supervisor (student cannot submit to academic directly)"))
+elements.append(bullet("can_submit_to_workplace property controls this action"))
+elements.append(bullet("Notification sent to workplace supervisor"))
+elements.append(spacer(3))
+
+elements.append(Paragraph("<b>Stage 2: Workplace Supervisor Authorization</b>", workflow_box_style))
+elements.append(bullet("Workplace supervisor reviews SUBMITTED logs only"))
+elements.append(bullet("Supervisor adds mandatory remarks/comments about student's work"))
+elements.append(bullet("Supervisor's name and review date are recorded automatically"))
+elements.append(bullet("Upon authorization, status changes to AUTHORIZED"))
+elements.append(bullet("is_authorized flag is set to True"))
+elements.append(bullet("Log is NOT automatically forwarded - student must submit manually"))
+elements.append(bullet("Student receives notification that log is authorized"))
+elements.append(bullet("can_workplace_review property enforces this stage"))
+elements.append(spacer(3))
+
+elements.append(Paragraph("<b>Stage 3: Student Submission to Academic</b>", workflow_box_style))
+elements.append(bullet("Student sees 'Submit to Academic Supervisor' button for AUTHORIZED logs"))
+elements.append(bullet("Student personally submits the authorized log"))
+elements.append(bullet("Status changes to PENDING_EVALUATION"))
+elements.append(bullet("Workplace remarks are included in the submission"))
+elements.append(bullet("can_submit_to_academic property ensures log is authorized first"))
+elements.append(bullet("Academic supervisor receives notification"))
+elements.append(spacer(3))
+
+elements.append(Paragraph("<b>Stage 4: Academic Supervisor Evaluation</b>", workflow_box_style))
+elements.append(bullet("Academic supervisor sees logs with status PENDING_EVALUATION"))
+elements.append(bullet("Academic can view: original log + workplace supervisor's name + workplace comments"))
+elements.append(bullet("Academic adds evaluation comments (mandatory)"))
+elements.append(bullet("Academic awards marks/grade (0-100 scale)"))
+elements.append(bullet("Academic's name and evaluation date are recorded"))
+elements.append(bullet("Status changes to EVALUATED (workflow complete)"))
+elements.append(bullet("can_academic_evaluate property enforces proper sequencing"))
+elements.append(bullet("Student receives notification with marks and feedback"))
+
+elements.append(spacer(3))
+elements.append(heading3("Business Rules Enforcement"))
+elements.append(spacer(2))
+
+business_rules = [
+    ['Rule', 'Implementation', 'Validation'],
+    ['No skipping workplace review', 'Model validation in clean() method', 'ValidationError if status jumps to PENDING_EVALUATION without authorization'],
+    ['Workplace authorization mandatory', 'can_submit_to_academic property checks is_authorized flag', 'API returns 400 if not authorized'],
+    ['Only student can submit to academic', 'View enforces request.user == log.student', 'PermissionDenied for non-owners'],
+    ['Marks only by academic supervisor', 'marks_awarded field restricted in model clean()', 'ValidationError if marks set in wrong status'],
+    ['Comments mandatory at each stage', 'Serializer validation requires non-empty comments', 'API returns 400 if comment missing'],
+    ['Sequential status transitions', 'Model clean() validates status flow', 'Cannot skip stages in workflow'],
+]
+business_table = Table(business_rules, colWidths=[120, 200, 180])
+business_table.setStyle(TableStyle(table_header_row()))
+elements.append(business_table)
+
+elements.append(spacer(3))
+elements.append(heading3("Dashboard Views for Each Role"))
+elements.append(spacer(2))
+
+elements.append(Paragraph("<b>Student Dashboard (/student-dashboard/)</b>", code_style))
+elements.append(bullet("Drafts: Logs that can be edited"))
+elements.append(bullet("Pending Workplace Review: Submitted logs awaiting workplace supervisor"))
+elements.append(bullet("Authorized for Academic: Logs approved by workplace, ready to submit to academic"))
+elements.append(bullet("Pending Academic Evaluation: Logs submitted to academic, awaiting evaluation"))
+elements.append(bullet("Evaluated: Completed logs with marks and feedback"))
+elements.append(bullet("Summary statistics: counts for each status"))
+elements.append(spacer(2))
+
+elements.append(Paragraph("<b>Workplace Supervisor Dashboard (/workplace-dashboard/)</b>", code_style))
+elements.append(bullet("Pending Review: SUBMITTED logs requiring authorization"))
+elements.append(bullet("Authorized: Logs that have been authorized (permanent record)"))
+elements.append(bullet("All Reviewed: Complete history of reviewed logs"))
+elements.append(bullet("Summary: pending_review count, authorized count, total_reviewed count"))
+elements.append(spacer(2))
+
+elements.append(Paragraph("<b>Academic Supervisor Dashboard (/academic-dashboard/)</b>", code_style))
+elements.append(bullet("Awaiting Evaluation: PENDING_EVALUATION logs with workplace authorization"))
+elements.append(bullet("Evaluated: Permanent record of evaluated logs with marks"))
+elements.append(bullet("Summary: awaiting_evaluation count, evaluated count, average_marks"))
+elements.append(bullet("Evaluated logs NEVER removed (permanent academic record)"))
+
+elements.append(spacer(3))
+elements.append(heading3("Validation Rules"))
+elements.append(bullet("<b>Hours Validation:</b> Maximum 60 hours per week enforced"))
+elements.append(bullet("<b>Unique Constraint:</b> One log per placement per week_number"))
+elements.append(bullet("<b>Workflow Validation:</b> Cannot skip stages, must follow DRAFT→SUBMITTED→AUTHORIZED→PENDING_EVALUATION→EVALUATED"))
+elements.append(bullet("<b>Authorization Check:</b> is_authorized flag must be True before academic submission"))
+elements.append(bullet("<b>Comments Required:</b> Both workplace and academic must provide feedback"))
 
 elements.append(spacer(3))
 elements.append(heading3("Screenshots"))
 elements.append(body("[Screenshot 8: Weekly Log Submission Form] - Student log entry interface"))
-elements.append(body("[Screenshot 9: Log Review Interface - Workplace Supervisor] - Review and comment"))
-elements.append(body("[Screenshot 10: Log Approval Interface - Academic Supervisor] - Approve reviewed logs"))
-elements.append(body("[Screenshot 11: Log Status Tracking] - Student view of log approval progress"))
+elements.append(body("[Screenshot 9: Student Dashboard - Grouped Logs] - Logs organized by workflow stage"))
+elements.append(body("[Screenshot 10: Authorized Log with Submit Button] - Student view with 'Submit to Academic' action"))
+elements.append(body("[Screenshot 11: Workplace Supervisor Authorization Form] - Review and authorize interface"))
+elements.append(body("[Screenshot 12: Workplace Dashboard] - Pending/Authorized/Reviewed sections"))
+elements.append(body("[Screenshot 13: Academic Evaluation Form] - Evaluation interface with workplace remarks visible"))
+elements.append(body("[Screenshot 14: Academic Dashboard] - Awaiting Evaluation and Evaluated sections"))
+elements.append(body("[Screenshot 15: Evaluated Log View] - Student sees marks and both supervisor comments"))
 
 elements.append(PageBreak())
 
-# --- MODULE 4 & 5: Supervisor Review + Academic Evaluation ---
-elements.append(heading2("2.4 Supervisor Review Workflow"))
+# --- MODULE 4: Multi-Stage Supervisor Review Workflow ---
+elements.append(heading2("2.4 Multi-Stage Supervisor Review Workflow"))
 elements.append(spacer(5))
 
 elements.append(heading3("Technical Overview"))
 elements.append(body(
-    "The Supervisor Review Workflow implements a two-tier review system. Workplace supervisors review logs first, "
-    "providing comments and marking them as reviewed. Academic supervisors then approve or reject the reviewed logs. "
-    "This ensures both practical (workplace) and academic oversight of the student's internship progress."
+    "The Multi-Stage Supervisor Review Workflow is the cornerstone of the ILES system's quality assurance. "
+    "It implements a mandatory three-stage approval process that ensures every weekly log receives:<br/>"
+    "1. <b>Practical oversight</b> from workplace supervisors who observe daily work<br/>"
+    "2. <b>Academic evaluation</b> from academic supervisors who assess learning outcomes<br/>"
+    "3. <b>Student responsibility</b> for submitting at each stage<br/><br/>"
+    "This implementation prevents workflow shortcuts and maintains professional standards for internship documentation."
 ))
 
 elements.append(spacer(3))
-elements.append(heading3("Workflow Logic"))
-elements.append(bullet("<b>Workplace Supervisor:</b> Can only view SUBMITTED logs. Submits review comments. Can also reject."))
-elements.append(bullet("<b>Academic Supervisor:</b> Can only view REVIEWED logs. Final approval/rejection authority."))
-elements.append(bullet("<b>Notifications:</b> Automatically sent to relevant parties at each transition"))
-elements.append(bullet("<b>Validation:</b> Comment required for all decisions (approve/reject/review)"))
+elements.append(heading3("Stage 1: Workplace Supervisor Authorization"))
+elements.append(spacer(2))
+
+stage1_data = [
+    ['Action', 'Description', 'Validation'],
+    ['View Submitted Logs', 'Supervisor sees only SUBMITTED status logs', 'Queryset filtered by status and assigned placement'],
+    ['Read Log Content', 'Review activities, hours, challenges, learning', 'All fields visible with formatting'],
+    ['Add Remarks', 'Mandatory comments about student performance', 'ValidationError if empty'],
+    ['Authorize Log', 'Click authorize button to approve', 'Sets is_authorized=True, status=AUTHORIZED'],
+    ['Record Metadata', 'System captures supervisor name and date', 'Auto-populated from request.user'],
+]
+stage1_table = Table(stage1_data, colWidths=[100, 220, 180])
+stage1_table.setStyle(TableStyle(table_header_row()))
+elements.append(stage1_table)
+
+elements.append(spacer(3))
+elements.append(Paragraph("<b>Key Implementation Details:</b>", body_style))
+elements.append(bullet("Endpoint: POST /weeklylogs/{id}/authorize/"))
+elements.append(bullet("Permission Check: request.user.role == 'workplace_supervisor'"))
+elements.append(bullet("Validation: log.placement.workplace_supervisor == request.user"))
+elements.append(bullet("Required Field: workplace_supervisor_comment (non-empty)"))
+elements.append(bullet("Status Transition: SUBMITTED → AUTHORIZED"))
+elements.append(bullet("Notification: Student is notified that log is authorized"))
+elements.append(bullet("IMPORTANT: Log is NOT automatically sent to academic supervisor"))
+
+elements.append(spacer(5))
+elements.append(heading3("Stage 2: Student Submission to Academic"))
+elements.append(spacer(2))
+
+stage2_data = [
+    ['Action', 'Description', 'Validation'],
+    ['View Authorized Logs', 'Student sees AUTHORIZED logs in dashboard', 'Filtered by student ownership'],
+    ['See Submit Button', '"Submit to Academic Supervisor" button appears', 'Only shown for AUTHORIZED status'],
+    ['Read Workplace Remarks', 'Student can view workplace feedback', 'workplace_supervisor_comment displayed'],
+    ['Submit to Academic', 'Student clicks submit button', 'Requires: status==AUTHORIZED AND is_authorized==True'],
+    ['Status Change', 'Log moves to academic queue', 'Status becomes PENDING_EVALUATION'],
+]
+stage2_table = Table(stage2_data, colWidths=[100, 220, 180])
+stage2_table.setStyle(TableStyle(table_header_row()))
+elements.append(stage2_table)
+
+elements.append(spacer(3))
+elements.append(Paragraph("<b>Key Implementation Details:</b>", body_style))
+elements.append(bullet("Endpoint: POST /weeklylogs/{id}/submit_to_academic/"))
+elements.append(bullet("Permission Check: request.user.role == 'student' AND log.student == request.user"))
+elements.append(bullet("Validation: log.status == 'AUTHORIZED' AND log.is_authorized == True"))
+elements.append(bullet("Required: workplace_supervisor_comment must exist"))
+elements.append(bullet("Status Transition: AUTHORIZED → PENDING_EVALUATION"))
+elements.append(bullet("Notification: Academic supervisor is notified"))
+elements.append(bullet("Workplace remarks are carried forward with the log"))
+
+elements.append(spacer(5))
+elements.append(heading3("Stage 3: Academic Supervisor Evaluation"))
+elements.append(spacer(2))
+
+stage3_data = [
+    ['Action', 'Description', 'Validation'],
+    ['View Pending Logs', 'Academic sees PENDING_EVALUATION logs', 'Filtered by assigned placement'],
+    ['Review Full Context', 'Sees: student log + workplace remarks', 'All previous comments visible'],
+    ['Add Evaluation', 'Academic provides evaluation comments', 'ValidationError if empty'],
+    ['Award Marks', 'Assign numerical grade (0-100)', 'Decimal field, marks_awarded'],
+    ['Finalize', 'Click evaluate button to complete', 'Status becomes EVALUATED'],
+    ['Record Metadata', 'System captures academic name and date', 'Auto-populated from request.user'],
+]
+stage3_table = Table(stage3_data, colWidths=[100, 220, 180])
+stage3_table.setStyle(TableStyle(table_header_row()))
+elements.append(stage3_table)
+
+elements.append(spacer(3))
+elements.append(Paragraph("<b>Key Implementation Details:</b>", body_style))
+elements.append(bullet("Endpoint: POST /weeklylogs/{id}/evaluate/"))
+elements.append(bullet("Permission Check: request.user.role == 'academic_supervisor'"))
+elements.append(bullet("Validation: log.placement.academic_supervisor == request.user"))
+elements.append(bullet("Required Fields: academic_supervisor_comment (non-empty), marks_awarded"))
+elements.append(bullet("Marks Range: 0-100 (enforced by serializer validation)"))
+elements.append(bullet("Status Transition: PENDING_EVALUATION → EVALUATED"))
+elements.append(bullet("Notification: Student receives marks and feedback"))
+elements.append(bullet("Workflow Complete: is_complete property returns True"))
+
+elements.append(spacer(5))
+elements.append(heading3("Workflow Enforcement Mechanisms"))
+elements.append(spacer(2))
+
+enforcement_data = [
+    ['Mechanism', 'Implementation', 'Purpose'],
+    ['Model Validation', 'clean() method validates status transitions', 'Prevents invalid state changes'],
+    ['Computed Properties', '@property decorators check workflow eligibility', 'Frontend control logic'],
+    ['Serializer Validation', 'Custom serializers validate stage requirements', 'API-level enforcement'],
+    ['View Permissions', 'Role-based permission checks in views', 'Authorization control'],
+    ['Queryset Filtering', 'Role-specific querysets in get_queryset()', 'Data isolation'],
+    ['Status Checks', 'if statements validate current status before actions', 'Prevents skipping stages'],
+]
+enforcement_table = Table(enforcement_data, colWidths=[120, 200, 180])
+enforcement_table.setStyle(TableStyle(table_header_row()))
+elements.append(enforcement_table)
+
+elements.append(spacer(3))
+elements.append(heading3("Error Handling"))
+elements.append(bullet("<b>PermissionDenied:</b> Wrong role attempting action → HTTP 403"))
+elements.append(bullet("<b>ValidationError:</b> Invalid status transition → HTTP 400 with detailed message"))
+elements.append(bullet("<b>Not Found:</b> Log doesn't exist or user can't access → HTTP 404"))
+elements.append(bullet("<b>Bad Request:</b> Missing required fields → HTTP 400 with field-specific errors"))
 
 elements.append(spacer(3))
 elements.append(heading3("Screenshots"))
-elements.append(body("[Screenshot 12: Workplace Review Comments] - Comment form for workplace supervisor"))
-elements.append(body("[Screenshot 13: Academic Approval Screen] - Approval/Reject interface for academic supervisor"))
+elements.append(body("[Screenshot 12: Workplace Authorization Interface] - Form with remarks field and authorize button"))
+elements.append(body("[Screenshot 13: Student Authorized Logs View] - Dashboard showing 'Submit to Academic' button"))
+elements.append(body("[Screenshot 14: Academic Evaluation Interface] - Form showing workplace remarks + evaluation fields"))
+elements.append(body("[Screenshot 15: Complete Workflow Trace] - Single log showing all three stages with timestamps"))
 
-elements.append(spacer(10))
+elements.append(PageBreak())
 
 # --- MODULE 5: Academic Evaluation ---
 elements.append(heading2("2.5 Academic Evaluation Module"))
