@@ -45,7 +45,7 @@ function WorkplaceSupervisorDashboard() {
     try {
       await reviewWeeklyLog(logId, {
         status: decisionStatus,
-        supervisor_comment: comment,
+        workplace_supervisor_comment: comment,
       });
       setMessage(`Log ${decisionStatus.toLowerCase()} successfully.`);
       setFeedback((prev) => {
@@ -208,8 +208,8 @@ function WorkplaceSupervisorDashboard() {
                         <button
                           type="button"
                           className={`${styles.actionBtn} ${styles.reviewBtn}`}
-                          onClick={() => handleDecision(log.id, "REVIEWED")}
-                          title="Review and forward to Academic Supervisor"
+                          onClick={() => handleDecision(log.id, "AUTHORIZED")}
+                          title="Review and authorize for Academic Supervisor"
                         >
                           Review Log
                         </button>
