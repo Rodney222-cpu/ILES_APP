@@ -1,5 +1,6 @@
 # Virtual environment
 venv/
+iles_venv/
 
 # Python cache
 __pycache__/
@@ -13,3 +14,12 @@ db.sqlite3
 
 # VS Code
 .vscode/*.pyc 
+.aider*
+.refact/
+
+# Test files
+test_api.py
+BUTTON_FIXES_SUMMARY.txt
+
+# Node modules
+node_modules/

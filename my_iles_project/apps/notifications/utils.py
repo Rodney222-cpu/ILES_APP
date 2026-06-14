@@ -79,7 +79,7 @@ def notify_log_submitted(log, supervisors):
             recipient=supervisor,
             notification_type='log_submitted',
             title='New Log Submitted',
-            message=f'{log.student.username} submitted Week {log.week_number} log',
+            message=f'{log.placement.student.username} submitted Week {log.week_number} log',
             related_log_id=log.id
         )
 
@@ -87,7 +87,7 @@ def notify_log_submitted(log, supervisors):
 def notify_log_reviewed(log):
     """Notify student when log is reviewed"""
     create_notification(
-        recipient=log.student,
+        recipient=log.placement.student,
         notification_type='log_reviewed',
         title='Log Reviewed',
         message=f'Your Week {log.week_number} log has been reviewed by your supervisor',
@@ -98,7 +98,7 @@ def notify_log_reviewed(log):
 def notify_log_approved(log):
     """Notify student when log is approved"""
     create_notification(
-        recipient=log.student,
+        recipient=log.placement.student,
         notification_type='log_approved',
         title='Log Approved',
         message=f'Your Week {log.week_number} log has been approved!',
@@ -109,7 +109,7 @@ def notify_log_approved(log):
 def notify_log_rejected(log):
     """Notify student when log is rejected"""
     create_notification(
-        recipient=log.student,
+        recipient=log.placement.student,
         notification_type='log_rejected',
         title='Log Rejected',
         message=f'Your Week {log.week_number} log was rejected. Please review the feedback.',

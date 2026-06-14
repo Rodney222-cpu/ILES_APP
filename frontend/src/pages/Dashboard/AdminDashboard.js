@@ -50,9 +50,15 @@ function AdminDashboard() {
   const fetchSupervisors = async () => {
     try {
       const response = await getSupervisors();
+      console.log('Supervisors fetched:', response.data);
       setSupervisors(response.data || []);
+      if (!response.data || response.data.length === 0) {
+        console.warn('No academic supervisors found in the system');
+      }
     } catch (err) {
-      console.error('Failed to load supervisors');
+      console.error('Failed to load supervisors:', err);
+      console.error('Supervisor error response:', err.response?.data);
+      setError('Failed to load supervisors. Please check your permissions.');
     }
   };
 
@@ -150,12 +156,23 @@ function AdminDashboard() {
       setError('Please select a supervisor');
       return;
     }
+    
+    // Convert to integer to ensure correct type
+    const supervisorId = parseInt(selectedSupervisor, 10);
+    
+    console.log('Assigning supervisor:', {
+      placementId: selectedPlacement.id,
+      supervisorId: supervisorId,
+      payload: { academic_supervisor_id: supervisorId }
+    });
+    
     try {
-      await assignSupervisor(selectedPlacement.id, { academic_supervisor_id: selectedSupervisor });
+      const response = await assignSupervisor(selectedPlacement.id, { academic_supervisor_id: supervisorId });
+      console.log('Supervisor assignment response:', response.data);
       
       // Optimistic update: move from approved to active
       setApprovedPlacements(prev => prev.filter(p => p.id !== selectedPlacement.id));
-      setActivePlacements(prev => [...prev, { ...selectedPlacement, status: 'active', academic_supervisor_id: selectedSupervisor }]);
+      setActivePlacements(prev => [...prev, { ...selectedPlacement, status: 'active', academic_supervisor_id: supervisorId }]);
       setStats(prev => ({
         ...prev,
         approved: Math.max(0, (prev.approved || 0) - 1),
@@ -163,6 +180,7 @@ function AdminDashboard() {
       }));
       
       setMessage('Academic supervisor assigned successfully!');
+      setError('');
       closeModal();
       
       // Background sync
@@ -173,7 +191,18 @@ function AdminDashboard() {
       }
     } catch (err) {
       console.error('Assign supervisor error:', err);
-      setError('Failed to assign supervisor');
+      console.error('Error response:', err.response?.data);
+      
+      if (err.response?.data) {
+        const errorMsg = typeof err.response.data === 'string' 
+          ? err.response.data 
+          : JSON.stringify(err.response.data);
+        setError(`Failed to assign supervisor: ${errorMsg}`);
+      } else if (err.message) {
+        setError(`Failed to assign supervisor: ${err.message}`);
+      } else {
+        setError('Failed to assign supervisor. Please check your connection and try again.');
+      }
     }
   };
 
@@ -239,8 +268,28 @@ function AdminDashboard() {
         </div>
       </div>
 
-      {message && <div className={styles.successAlert}>{message}</div>}
-      {error && <div className={styles.errorAlert}>{error}</div>}
+      {message && (
+        <div className={styles.successAlert} style={{margin: '1rem 0'}}>
+          {message}
+          <button 
+            onClick={() => setMessage('')} 
+            style={{marginLeft: '1rem', cursor: 'pointer', background: 'none', border: 'none', fontSize: '1.2rem'}}
+          >
+            ×
+          </button>
+        </div>
+      )}
+      {error && (
+        <div className={styles.errorAlert} style={{margin: '1rem 0'}}>
+          {error}
+          <button 
+            onClick={() => setError('')} 
+            style={{marginLeft: '1rem', cursor: 'pointer', background: 'none', border: 'none', fontSize: '1.2rem'}}
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       {/* End Date Alert for active internships that have passed their end date */}
       {activePlacements.filter(p => p.is_past_end_date).length > 0 && (
@@ -609,10 +658,15 @@ function AdminDashboard() {
 
               {modalType === 'assign' && (
                 <div className={styles.actionForm}>
+                  {error && <div className={styles.errorAlert} style={{marginBottom: '1rem'}}>{error}</div>}
                   <label>Select Academic Supervisor *</label>
                   <select
                     value={selectedSupervisor}
-                    onChange={(e) => setSelectedSupervisor(e.target.value)}
+                    onChange={(e) => {
+                      console.log('Supervisor selected:', e.target.value);
+                      setSelectedSupervisor(e.target.value);
+                      setError(''); // Clear error when selection changes
+                    }}
                   >
                     <option value="">-- Select Supervisor --</option>
                     {supervisors.map((sup) => (
@@ -621,8 +675,17 @@ function AdminDashboard() {
                       </option>
                     ))}
                   </select>
+                  {supervisors.length === 0 && (
+                    <p style={{color: '#dc2626', fontSize: '0.875rem', marginTop: '0.5rem'}}>
+                      No academic supervisors available. Please create supervisor accounts first.
+                    </p>
+                  )}
                   <div className={styles.actionFormButtons}>
-                    <button className={styles.btnApprove} onClick={handleAssignSupervisor}>
+                    <button 
+                      className={styles.btnApprove} 
+                      onClick={handleAssignSupervisor}
+                      disabled={!selectedSupervisor || supervisors.length === 0}
+                    >
                       Assign Supervisor
                     </button>
                     <button className={styles.btnCancel} onClick={closeModal}>

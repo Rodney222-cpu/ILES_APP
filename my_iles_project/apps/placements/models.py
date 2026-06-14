@@ -3,11 +3,11 @@ from django.conf import settings
 
 class InternshipPlacement(models.Model):
     status_choices = [
-        ('pending_approval', 'Pending Approval'),  # Student submitted, waiting for admin
-        ('approved', 'Approved'),  # Admin approved, supervisor assigned
-        ('rejected', 'Rejected'),  # Admin rejected
-        ('active', 'Active'),  # Internship is ongoing
-        ('completed', 'Completed')  # Internship finished
+        ('pending_approval', 'Pending Approval'),  
+        ('approved', 'Approved'),  
+        ('rejected', 'Rejected'), 
+        ('active', 'Active'),  
+        ('completed', 'Completed')  
     ]
 
     student = models.OneToOneField(
@@ -29,7 +29,6 @@ class InternshipPlacement(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     
-    # Supervisors (nullable until assigned by admin)
     workplace_supervisor = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

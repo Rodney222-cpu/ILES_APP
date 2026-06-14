@@ -24,11 +24,19 @@ function SubmitLogPage() {
   const fetchPlacement = async () => {
     try {
       const response = await getPlacement();
+      console.log("Placement API response:", response.data); // Debug log
       if (response.data && response.data.length > 0) {
-        setPlacement(response.data[0]);
+        const placementData = response.data[0];
+        console.log("Placement data:", placementData); // Debug log
+        setPlacement(placementData);
+      } else {
+        console.log("No placement found for student");
+        setPlacement(null);
       }
     } catch (err) {
       console.error("Failed to fetch placement:", err);
+      setError("Failed to load placement information. Please try again.");
+      setPlacement(null);
     }
   };
 
@@ -65,8 +73,13 @@ function SubmitLogPage() {
     e.preventDefault();
     
     // Check if placement exists and is approved
-    if (!canSubmitLog) {
-      setError("You must have an approved placement before submitting logs. Please go to Dashboard to submit your placement request.");
+    if (!placement) {
+      setError("You don't have a placement yet. Please submit a placement request from the Dashboard first.");
+      return;
+    }
+    
+    if (!(placement.status === 'approved' || placement.status === 'active')) {
+      setError(`Your placement status is "${placement.status}". You need an approved or active placement to submit logs.`);
       return;
     }
     
@@ -77,14 +90,31 @@ function SubmitLogPage() {
     try {
       const payload = new FormData();
       
+      // Required fields
+      if (!formData.week_number) {
+        throw new Error("Week number is required");
+      }
+      if (!formData.hours_spent) {
+        throw new Error("Hours spent is required");
+      }
+      if (!formData.activities) {
+        throw new Error("Activities description is required");
+      }
+      
       Object.entries(formData).forEach(([key, value]) => {
         if (value !== "" && value !== null) {
           payload.append(key, value);
         }
       });
 
-      await createWeeklyLog(payload);
+      console.log("Submitting log with data:", Object.fromEntries(payload)); // Debug log
+      
+      const response = await createWeeklyLog(payload);
+      console.log("Log submission response:", response.data); // Debug log
+      
       setSuccess("Log submitted successfully.");
+      
+      // Reset form
       setFormData({
         description: "",
         hours_spent: "",
@@ -94,14 +124,22 @@ function SubmitLogPage() {
         week_number: "",
         attachment: null,
       });
+      
+      // Reset file input
+      const fileInput = document.querySelector('input[type="file"]');
+      if (fileInput) fileInput.value = '';
+      
       setCurrentPage(1);
       fetchLogs();
     } catch (err) {
+      console.error("Submit log error:", err);
       if (err.response?.data) {
         const msg = Object.values(err.response.data).flat().join(", ");
-        setError(msg);
+        setError(`Submission failed: ${msg}`);
+      } else if (err.message) {
+        setError(`Submission failed: ${err.message}`);
       } else {
-        setError("Failed to submit log.");
+        setError("Failed to submit log. Please check your internet connection and try again.");
       }
     } finally {
       setLoading(false);
@@ -131,6 +169,10 @@ function SubmitLogPage() {
   };
 
   const canSubmitLog = placement && (placement.status === 'approved' || placement.status === 'active');
+  
+  // Debug log to help identify issues
+  console.log("Placement state:", placement);
+  console.log("Can submit log:", canSubmitLog);
 
   return (
     <div className={styles.page}>

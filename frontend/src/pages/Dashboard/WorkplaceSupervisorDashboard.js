@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
 import { getWeeklyLogs, reviewWeeklyLog, getPlacement } from "../../services/api";
-import EvaluationForm from "../../components/EvaluationForm/EvaluationForm";
 import styles from "./SupervisorDashboard.module.css";
 
 function WorkplaceSupervisorDashboard() {
@@ -10,8 +9,6 @@ function WorkplaceSupervisorDashboard() {
   const [feedback, setFeedback] = useState({});
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [showEvaluationForm, setShowEvaluationForm] = useState(false);
-  const [selectedPlacement, setSelectedPlacement] = useState(null);
 
   const fetchPlacements = async () => {
     try {
@@ -67,29 +64,6 @@ function WorkplaceSupervisorDashboard() {
     }
   };
 
-  const openEvaluationForm = (placement) => {
-    setSelectedPlacement(placement);
-    setShowEvaluationForm(true);
-  };
-
-  const closeEvaluationForm = () => {
-    setShowEvaluationForm(false);
-    setSelectedPlacement(null);
-  };
-
-  if (showEvaluationForm && selectedPlacement) {
-    return (
-      <EvaluationForm
-        placement={selectedPlacement}
-        onSuccess={() => {
-          closeEvaluationForm();
-          setMessage("Evaluation submitted successfully!");
-        }}
-        onCancel={closeEvaluationForm}
-      />
-    );
-  }
-
   return (
     <div className={styles.page}>
       <div className={styles.header}>
@@ -123,12 +97,6 @@ function WorkplaceSupervisorDashboard() {
                     <span>{placement.start_date} to {placement.end_date}</span>
                   </div>
                 </div>
-                <button
-                  className={styles.evaluateBtn}
-                  onClick={() => openEvaluationForm(placement)}
-                >
-                  Evaluate Student
-                </button>
               </div>
             ))}
           </div>

@@ -71,24 +71,24 @@ class WeeklyLogView(viewsets.ModelViewSet):
         # Automatically get the student's placement
         try:
             placement = user.placement_as_student
-        except Exception:
+        except Exception as e:
             raise ValidationError({
-                "detail": "You do not have an approved placement. Please submit a placement request first and wait for admin approval."
+                "placement": "You do not have an approved placement. Please submit a placement request first and wait for admin approval."
             })
         
         # Check if placement is approved or active
         if placement.status not in ['approved', 'active']:
             if placement.status == 'pending_approval':
                 raise ValidationError({
-                    "detail": "Your placement request is pending admin approval. You cannot submit logs until it is approved."
+                    "placement": "Your placement request is pending admin approval. You cannot submit logs until it is approved."
                 })
             elif placement.status == 'rejected':
                 raise ValidationError({
-                    "detail": f"Your placement request was rejected. Reason: {placement.admin_comment or 'No reason provided'}. Please contact the administrator."
+                    "placement": f"Your placement request was rejected. Reason: {placement.admin_comment or 'No reason provided'}. Please contact the administrator."
                 })
             else:
                 raise ValidationError({
-                    "detail": "You do not have an active placement. Please contact the administrator."
+                    "placement": "You do not have an active placement. Please contact the administrator."
                 })
 
         # Auto-set log_date to today
@@ -105,15 +105,20 @@ class WeeklyLogView(viewsets.ModelViewSet):
             deadline=deadline
         )
         
-        # Notify supervisors
-        supervisors = []
-        if placement.workplace_supervisor:
-            supervisors.append(placement.workplace_supervisor)
-        if placement.academic_supervisor:
-            supervisors.append(placement.academic_supervisor)
-        
-        if supervisors:
-            notify_log_submitted(log, supervisors)
+        # Notify supervisors (wrapped in try/except so notification failures don't break submission)
+        try:
+            supervisors = []
+            if placement.workplace_supervisor:
+                supervisors.append(placement.workplace_supervisor)
+            if placement.academic_supervisor:
+                supervisors.append(placement.academic_supervisor)
+            
+            if supervisors:
+                notify_log_submitted(log, supervisors)
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Failed to send log submission notification: {e}")
 
     # =======================
     # UPDATE (EDIT DRAFT)
