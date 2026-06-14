@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createWeeklyLog, getWeeklyLogs, getPlacement } from "../../services/api";
+import { createWeeklyLog, getWeeklyLogs, getPlacement, submitLogToAcademic } from "../../services/api";
 import styles from "./SubmitLogPage.module.css";
 
 const PAGE_SIZE = 5;
@@ -146,14 +146,33 @@ function SubmitLogPage() {
     }
   };
 
+  const handleSubmitToAcademic = async (logId) => {
+    if (!window.confirm('Are you sure you want to submit this log to your academic supervisor for evaluation?')) {
+      return;
+    }
+
+    try {
+      await submitLogToAcademic(logId);
+      setSuccess('Log submitted to academic supervisor successfully!');
+      fetchLogs();
+    } catch (err) {
+      console.error('Submit to academic error:', err);
+      if (err.response?.data?.detail) {
+        setError(err.response.data.detail);
+      } else {
+        setError('Failed to submit log to academic supervisor.');
+      }
+    }
+  };
+
   const totalLogs = logs.length;
   const pendingLogs = logs.filter((log) =>
-    ["DRAFT", "SUBMITTED", "PENDING", "REVIEWED"].includes(
+    ["DRAFT", "SUBMITTED", "AUTHORIZED", "PENDING_EVALUATION"].includes(
       String(log.status || "").toUpperCase()
     )
   ).length;
-  const approvedLogs = logs.filter(
-    (log) => String(log.status || "").toUpperCase() === "APPROVED"
+  const evaluatedLogs = logs.filter(
+    (log) => String(log.status || "").toUpperCase() === "EVALUATED"
   ).length;
 
   const totalPages = Math.max(1, Math.ceil(totalLogs / PAGE_SIZE));
@@ -161,11 +180,11 @@ function SubmitLogPage() {
   const paginatedLogs = logs.slice(start, start + PAGE_SIZE);
 
   const statusClassMap = {
-    APPROVED: styles.approved,
-    REVIEWED: styles.reviewed,
+    EVALUATED: styles.approved,
+    PENDING_EVALUATION: styles.reviewed,
+    AUTHORIZED: styles.reviewed,
     SUBMITTED: styles.pending,
     DRAFT: styles.pending,
-    PENDING: styles.pending,
   };
 
   const canSubmitLog = placement && (placement.status === 'approved' || placement.status === 'active');
@@ -196,9 +215,9 @@ function SubmitLogPage() {
           <p className={styles.cardSubLabel}>Logs Pending</p>
         </div>
         <div className={`${styles.card} ${styles.blue}`}>
-          <p className={styles.cardValue}>{approvedLogs}</p>
-          <p className={styles.cardLabel}>Approved Logs</p>
-          <p className={styles.cardSubLabel}>Logs Approved</p>
+          <p className={styles.cardValue}>{evaluatedLogs}</p>
+          <p className={styles.cardLabel}>Evaluated Logs</p>
+          <p className={styles.cardSubLabel}>Logs Evaluated</p>
         </div>
       </div>
 
@@ -216,10 +235,14 @@ function SubmitLogPage() {
               <thead>
                 <tr>
                   <th>Date ↓</th>
+                  <th>Week</th>
                   <th>Description</th>
                   <th>Hours ↓</th>
                   <th>Status ↓</th>
-                  <th>Supervisor Feedback</th>
+                  <th>Workplace Review</th>
+                  <th>Academic Evaluation</th>
+                  <th>Marks</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -228,14 +251,49 @@ function SubmitLogPage() {
                   return (
                     <tr key={log.id}>
                       <td>{log.log_date || "-"}</td>
+                      <td>{log.week_number || "-"}</td>
                       <td>{log.activities || log.description || "-"}</td>
                       <td>{log.hours_spent || 0}</td>
                       <td>
                         <span className={`${styles.statusBadge} ${statusClassMap[status] || styles.pending}`}>
-                          {status === "SUBMITTED" ? "Pending" : status === "REVIEWED" ? "Reviewed" : status}
+                          {status === "SUBMITTED" ? "Awaiting Workplace Review" : 
+                           status === "AUTHORIZED" ? "Ready for Academic Submission" :
+                           status === "PENDING_EVALUATION" ? "Pending Academic Evaluation" :
+                           status === "EVALUATED" ? "Evaluated" : status}
                         </span>
                       </td>
-                      <td>{log.supervisor_comment || "-"}</td>
+                      <td>
+                        {log.workplace_supervisor_comment ? (
+                          <div style={{fontSize: '0.85rem'}}>
+                            <strong>{log.workplace_reviewer_name || 'Supervisor'}</strong>
+                            <p>{log.workplace_supervisor_comment}</p>
+                          </div>
+                        ) : "-"}
+                      </td>
+                      <td>
+                        {log.academic_supervisor_comment ? (
+                          <div style={{fontSize: '0.85rem'}}>
+                            <strong>{log.academic_evaluator_name || 'Academic'}</strong>
+                            <p>{log.academic_supervisor_comment}</p>
+                          </div>
+                        ) : "-"}
+                      </td>
+                      <td>
+                        {log.marks_awarded ? (
+                          <strong style={{color: '#10b981'}}>{log.marks_awarded}</strong>
+                        ) : "-"}
+                      </td>
+                      <td>
+                        {status === "AUTHORIZED" && (
+                          <button
+                            className={styles.submitToAcademicBtn}
+                            onClick={() => handleSubmitToAcademic(log.id)}
+                            title="Submit to Academic Supervisor"
+                          >
+                            Submit to Academic
+                          </button>
+                        )}
+                      </td>
                     </tr>
                   );
                 })}

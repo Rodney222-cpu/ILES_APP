@@ -206,6 +206,10 @@ function AdminDashboard() {
       return;
     }
     
+    if (isProcessing) {
+      return;
+    }
+    
     // Convert to integer to ensure correct type
     const supervisorId = parseInt(selectedSupervisor, 10);
     
@@ -216,6 +220,9 @@ function AdminDashboard() {
     });
     
     try {
+      setIsProcessing(true);
+      setError('');
+      
       const response = await assignSupervisor(selectedPlacement.id, { academic_supervisor_id: supervisorId });
       console.log('Supervisor assignment response:', response.data);
       
@@ -241,22 +248,44 @@ function AdminDashboard() {
     } catch (err) {
       console.error('Assign supervisor error:', err);
       console.error('Error response:', err.response?.data);
+      console.error('Error status:', err.response?.status);
+      console.error('Error headers:', err.response?.headers);
       
-      if (err.response?.data) {
-        const errorMsg = typeof err.response.data === 'string' 
+      // Handle specific error types
+      let errorMessage = 'Failed to assign supervisor. ';
+      
+      if (err.code === 'ERR_NETWORK' || err.message.includes('Network Error')) {
+        errorMessage += 'Network error - The backend server may be down or restarting. Please wait a moment and try again.';
+      } else if (err.response?.status === 502 || err.response?.status === 503) {
+        errorMessage += 'Server is temporarily unavailable (may be waking up from sleep). Please wait 30 seconds and try again.';
+      } else if (err.response?.status === 500) {
+        errorMessage += 'Server error. Please contact support.';
+      } else if (err.response?.status === 403) {
+        errorMessage += 'Permission denied. Make sure you are logged in as admin.';
+      } else if (err.response?.data) {
+        const serverError = typeof err.response.data === 'string' 
           ? err.response.data 
-          : JSON.stringify(err.response.data);
-        setError(`Failed to assign supervisor: ${errorMsg}`);
+          : err.response.data.detail || err.response.data.message || JSON.stringify(err.response.data);
+        errorMessage += serverError;
       } else if (err.message) {
-        setError(`Failed to assign supervisor: ${err.message}`);
-      } else {
-        setError('Failed to assign supervisor. Please check your connection and try again.');
+        errorMessage += err.message;
       }
+      
+      setError(errorMessage);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const handleMarkCompleted = async () => {
+    if (isProcessing) {
+      return;
+    }
+    
     try {
+      setIsProcessing(true);
+      setError('');
+      
       await markPlacementCompleted(selectedPlacement.id);
       
       // Optimistic update: move from active to completed
@@ -279,7 +308,13 @@ function AdminDashboard() {
       }
     } catch (err) {
       console.error('Mark completed error:', err);
-      setError('Failed to mark as completed');
+      const errorMessage = err.response?.data?.detail 
+        || err.response?.data?.message 
+        || err.message 
+        || 'Failed to mark as completed';
+      setError(errorMessage);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -736,6 +771,7 @@ function AdminDashboard() {
                       setSelectedSupervisor(e.target.value);
                       setError(''); // Clear error when selection changes
                     }}
+                    disabled={isProcessing}
                   >
                     <option value="">-- Select Supervisor --</option>
                     {supervisors.map((sup) => (
@@ -753,11 +789,15 @@ function AdminDashboard() {
                     <button 
                       className={styles.btnApprove} 
                       onClick={handleAssignSupervisor}
-                      disabled={!selectedSupervisor || supervisors.length === 0}
+                      disabled={!selectedSupervisor || supervisors.length === 0 || isProcessing}
                     >
-                      Assign Supervisor
+                      {isProcessing ? 'Assigning...' : 'Assign Supervisor'}
                     </button>
-                    <button className={styles.btnCancel} onClick={closeModal}>
+                    <button 
+                      className={styles.btnCancel} 
+                      onClick={closeModal}
+                      disabled={isProcessing}
+                    >
                       Cancel
                     </button>
                   </div>
@@ -766,14 +806,23 @@ function AdminDashboard() {
 
               {modalType === 'complete' && (
                 <div className={styles.actionForm}>
+                  {error && <div className={styles.errorAlert} style={{marginBottom: '1rem'}}>{error}</div>}
                   <p style={{ color: '#4b5563', marginBottom: '1rem' }}>
                     Are you sure you want to mark <strong>{selectedPlacement.student_username}</strong>'s internship at <strong>{selectedPlacement.company_name}</strong> as completed?
                   </p>
                   <div className={styles.actionFormButtons}>
-                    <button className={styles.btnComplete} onClick={handleMarkCompleted}>
-                      Confirm Completed
+                    <button 
+                      className={styles.btnComplete} 
+                      onClick={handleMarkCompleted}
+                      disabled={isProcessing}
+                    >
+                      {isProcessing ? 'Processing...' : 'Confirm Completed'}
                     </button>
-                    <button className={styles.btnCancel} onClick={closeModal}>
+                    <button 
+                      className={styles.btnCancel} 
+                      onClick={closeModal}
+                      disabled={isProcessing}
+                    >
                       Cancel
                     </button>
                   </div>

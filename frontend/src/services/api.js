@@ -122,6 +122,18 @@ export const reviewWeeklyLog = (id, payload) => {
     return api.post(`/weeklylogs/weeklylogs/${id}/decision/`, payload);
 };
 
+export const authorizeWeeklyLog = (id, payload) => {
+    return api.post(`/weeklylogs/weeklylogs/${id}/authorize/`, payload);
+};
+
+export const submitLogToAcademic = (id) => {
+    return api.post(`/weeklylogs/weeklylogs/${id}/submit_to_academic/`);
+};
+
+export const evaluateWeeklyLog = (id, payload) => {
+    return api.post(`/weeklylogs/weeklylogs/${id}/evaluate/`, payload);
+};
+
 export default api;
 
 
