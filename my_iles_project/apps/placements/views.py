@@ -5,6 +5,7 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from django.contrib.auth import get_user_model
+import threading
 
 from .models import InternshipPlacement
 from .serializers import InternshipPlacementSerializer
@@ -108,9 +109,11 @@ class InternshipPlacementViewSet(viewsets.ModelViewSet):
         placement.admin_comment = request.data.get('admin_comment', '')
         placement.save()
         
-        # Notify student (in-app + email)
+        # Notify student (in-app notification immediately)
         notify_placement_approved(placement)
-        send_placement_approved_email(placement)
+        
+        # Send email asynchronously to avoid blocking
+        threading.Thread(target=send_placement_approved_email, args=(placement,)).start()
         
         serializer = self.get_serializer(placement)
         return Response({
@@ -139,9 +142,11 @@ class InternshipPlacementViewSet(viewsets.ModelViewSet):
         placement.admin_comment = admin_comment
         placement.save()
         
-        # Notify student (in-app + email)
+        # Notify student (in-app notification immediately)
         notify_placement_rejected(placement)
-        send_placement_rejected_email(placement)
+        
+        # Send email asynchronously to avoid blocking
+        threading.Thread(target=send_placement_rejected_email, args=(placement,)).start()
         
         serializer = self.get_serializer(placement)
         return Response({
@@ -174,9 +179,11 @@ class InternshipPlacementViewSet(viewsets.ModelViewSet):
         placement.status = 'active'
         placement.save()
         
-        # Notify both student and supervisor (in-app + email)
+        # Notify both student and supervisor (in-app notification immediately)
         notify_supervisor_assigned(placement)
-        send_supervisor_assigned_email(placement)
+        
+        # Send email asynchronously to avoid blocking
+        threading.Thread(target=send_supervisor_assigned_email, args=(placement,)).start()
         
         serializer = self.get_serializer(placement)
         return Response({

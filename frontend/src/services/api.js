@@ -155,15 +155,21 @@ export const getPendingPlacements = () => {
 };
 
 export const approvePlacement = (id, data) => {
-    return api.post(`/placements/${id}/approve/`, data);
+    return api.post(`/placements/${id}/approve/`, data, {
+        timeout: 60000, // 60 seconds for email sending
+    });
 };
 
 export const rejectPlacement = (id, data) => {
-    return api.post(`/placements/${id}/reject/`, data);
+    return api.post(`/placements/${id}/reject/`, data, {
+        timeout: 60000, // 60 seconds for email sending
+    });
 };
 
 export const assignSupervisor = (id, data) => {
-    return api.post(`/placements/${id}/assign_supervisor/`, data);
+    return api.post(`/placements/${id}/assign_supervisor/`, data, {
+        timeout: 60000, // 60 seconds for email sending
+    });
 };
 
 export const getSupervisors = () => {
