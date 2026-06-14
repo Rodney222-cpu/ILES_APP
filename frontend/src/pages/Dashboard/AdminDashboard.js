@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getPendingPlacements, approvePlacement, rejectPlacement, assignSupervisor, getSupervisors, getPlacement, getActivePlacements, getCompletedPlacements, getPlacementStats, markPlacementCompleted } from '../../services/api';
+import { getPendingPlacements, approvePlacement, rejectPlacement, assignSupervisor, getSupervisors, getPlacement, getActivePlacements, getCompletedPlacements, getPlacementStats, markPlacementCompleted, getEvaluatedLogs } from '../../services/api';
 import styles from './AdminDashboard.module.css';
 
 function AdminDashboard() {
@@ -7,6 +7,7 @@ function AdminDashboard() {
   const [approvedPlacements, setApprovedPlacements] = useState([]);
   const [activePlacements, setActivePlacements] = useState([]);
   const [completedPlacements, setCompletedPlacements] = useState([]);
+  const [evaluatedLogs, setEvaluatedLogs] = useState([]);
   const [stats, setStats] = useState({ pending_approval: 0, approved: 0, active: 0, completed: 0, rejected: 0, total: 0 });
   const [supervisors, setSupervisors] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,6 +38,10 @@ function AdminDashboard() {
       // Fetch completed placements
       const completedResponse = await getCompletedPlacements();
       setCompletedPlacements(completedResponse.data || []);
+
+      // Fetch evaluated logs
+      const evaluatedResponse = await getEvaluatedLogs();
+      setEvaluatedLogs(evaluatedResponse.data || []);
 
       // Fetch stats
       const statsResponse = await getPlacementStats();
@@ -617,6 +622,72 @@ function AdminDashboard() {
                   <td>{placement.academic_supervisor_username || 'N/A'}</td>
                   <td>
                     <span className={styles.badgeCompleted}>Completed</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {/* Evaluated Weekly Logs Table */}
+      <div className={styles.tableContainer}>
+        <h3>Evaluated Weekly Logs ({evaluatedLogs.length})</h3>
+        {evaluatedLogs.length === 0 ? (
+          <p className={styles.emptyState}>No evaluated logs yet</p>
+        ) : (
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Week</th>
+                <th>Company</th>
+                <th>Hours</th>
+                <th>Marks</th>
+                <th>Academic Evaluator</th>
+                <th>Evaluation Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {evaluatedLogs.map((log) => (
+                <tr key={log.id}>
+                  <td>
+                    <div className={styles.studentInfo}>
+                      <div className={`${styles.avatar} ${styles.avatarEvaluated}`}>
+                        {log.student_username?.charAt(0).toUpperCase() || 'S'}
+                      </div>
+                      <div>
+                        <div className={styles.studentName}>{log.student_username || 'Unknown'}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <strong>Week {log.week_number}</strong>
+                    <div className={styles.logDate}>{log.log_date}</div>
+                  </td>
+                  <td>{log.placement_company_name || 'N/A'}</td>
+                  <td>
+                    <span className={styles.hoursBadge}>{log.hours_spent}h</span>
+                  </td>
+                  <td>
+                    <div className={styles.marksDisplay}>
+                      <strong>{log.marks_awarded}/100</strong>
+                      <span className={`${styles.marksBadge} ${
+                        log.marks_awarded >= 75 ? styles.marksExcellent :
+                        log.marks_awarded >= 50 ? styles.marksGood :
+                        styles.marksPoor
+                      }`}>
+                        {log.marks_awarded >= 75 ? 'Excellent' :
+                         log.marks_awarded >= 50 ? 'Good' : 'Needs Improvement'}
+                      </span>
+                    </div>
+                  </td>
+                  <td>{log.academic_evaluator_name || 'N/A'}</td>
+                  <td>
+                    {log.academic_evaluation_date ? 
+                      new Date(log.academic_evaluation_date).toLocaleDateString() : 
+                      'N/A'
+                    }
                   </td>
                 </tr>
               ))}

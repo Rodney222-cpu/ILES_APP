@@ -16,6 +16,7 @@ function RegistrationForm() {
     student_number: "",
     staff_number: "",
     department: "",
+    company_name: "",
   });
 
   const [message, setMessage] = useState("");
@@ -77,6 +78,12 @@ function RegistrationForm() {
       return false;
     }
 
+    if (formData.role === "workplace_supervisor" && !formData.company_name) {
+      setMessage("Company name is required for workplace supervisors");
+      setType("error");
+      return false;
+    }
+
     return true;
   };
 
@@ -103,7 +110,10 @@ function RegistrationForm() {
       // Add role-specific fields
       if (payload.role === 'student') {
         cleanPayload.student_number = payload.student_number;
-      } else if (payload.role === 'workplace_supervisor' || payload.role === 'academic_supervisor') {
+      } else if (payload.role === 'workplace_supervisor') {
+        cleanPayload.staff_number = payload.staff_number;
+        cleanPayload.company_name = payload.company_name;
+      } else if (payload.role === 'academic_supervisor') {
         cleanPayload.staff_number = payload.staff_number;
       }
 
@@ -121,6 +131,7 @@ function RegistrationForm() {
         student_number: "",
         staff_number: "",
         department: "",
+        company_name: "",
       });
 
       setTimeout(() => {
@@ -245,6 +256,19 @@ function RegistrationForm() {
                 name="staff_number"
                 value={formData.staff_number}
                 placeholder="Enter your staff number"
+                onChange={handleChange}
+              />
+            </div>
+          )}
+
+          {formData.role === "workplace_supervisor" && (
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Company Name</label>
+              <input
+                className={styles.input}
+                name="company_name"
+                value={formData.company_name}
+                placeholder="Enter your company name"
                 onChange={handleChange}
               />
             </div>

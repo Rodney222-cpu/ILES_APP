@@ -134,6 +134,10 @@ export const evaluateWeeklyLog = (id, payload) => {
     return api.post(`/weeklylogs/weeklylogs/${id}/evaluate/`, payload);
 };
 
+export const getEvaluatedLogs = () => {
+    return api.get("/weeklylogs/weeklylogs/", { params: { status: "EVALUATED" } });
+};
+
 export default api;
 
 
