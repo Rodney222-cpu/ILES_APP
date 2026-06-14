@@ -6,6 +6,7 @@ function WorkplaceSupervisorDashboard() {
   const [logs, setLogs] = useState([]);
   const [placements, setPlacements] = useState([]);
   const [status, setStatus] = useState("ALL");
+  const [activeTab, setActiveTab] = useState('pending');
   const [feedback, setFeedback] = useState({});
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -22,18 +23,19 @@ function WorkplaceSupervisorDashboard() {
     }
   };
 
-  const fetchLogs = useCallback(async (selectedStatus = status) => {
+  const fetchLogs = useCallback(async () => {
     try {
-      const response = await getWeeklyLogs(selectedStatus);
+      // Fetch ALL logs to show complete history
+      const response = await getWeeklyLogs("ALL");
       setLogs(response.data || []);
     } catch (err) {
       setError("Failed to load assigned logs.");
     }
-  }, [status]);
+  }, []);
 
   useEffect(() => {
     fetchPlacements();
-    fetchLogs("ALL");
+    fetchLogs();
   }, [fetchLogs]);
 
   const handleDecision = async (logId, decisionStatus) => {
@@ -143,31 +145,6 @@ function WorkplaceSupervisorDashboard() {
           </div>
         </div>
       )}
-
-      <div className={styles.filterBar}>
-        <label htmlFor="statusFilter" className={styles.filterLabel}>
-          Filter by Status:
-        </label>
-        <select
-          id="statusFilter"
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          className={styles.filterSelect}
-        >
-          <option value="ALL">All Logs</option>
-          <option value="SUBMITTED">Submitted (Pending Review)</option>
-          <option value="REVIEWED">Reviewed</option>
-          <option value="APPROVED">Approved</option>
-          <option value="REJECTED">Rejected</option>
-        </select>
-        <button
-          type="button"
-          className={styles.filterBtn}
-          onClick={() => fetchLogs(status)}
-        >
-          Filter
-        </button>
-      </div>
 
       {/* Tabs for different sections */}
       <div className={styles.tabsContainer}>
@@ -380,113 +357,8 @@ function WorkplaceSupervisorDashboard() {
         </div>
       )}
 
-      <div className={styles.tableContainer}>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Student</th>
-              <th>Log Entry</th>
-              <th>Status</th>
-              <th>Feedback</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {logs.length === 0 ? (
-              <tr>
-                <td colSpan={5} className={styles.emptyState}>
-                  No logs found.
-                </td>
-              </tr>
-            ) : (
-              logs.map((log) => (
-                <tr key={log.id}>
-                  <td>
-                    <div className={styles.studentInfo}>
-                      <div className={styles.avatar}>
-                        {(log.student_username || "S").charAt(0).toUpperCase()}
-                      </div>
-                      <span className={styles.studentName}>
-                        {log.student_username || "Unknown"}
-                      </span>
-                    </div>
-                  </td>
-                  <td>
-                    <div className={styles.logEntry}>
-                      <div className={styles.logDescription}>
-                        {log.activities || log.description || "No description"}
-                      </div>
-                      <div className={styles.logMeta}>
-                        Week {log.week_number} • {log.log_date} • {log.hours_spent}h
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <span
-                      className={`${styles.statusBadge} ${
-                        styles[(log.status || "").toLowerCase()] || styles.submitted
-                      }`}
-                    >
-                      {log.status}
-                    </span>
-                  </td>
-                  <td>
-                    <div className={styles.feedbackCell}>
-                      {log.supervisor_comment && !feedback[log.id] ? (
-                        <div className={styles.existingFeedback}>
-                          {log.supervisor_comment}
-                        </div>
-                      ) : (
-                        <textarea
-                          value={feedback[log.id] ?? ""}
-                          onChange={(e) =>
-                            setFeedback((prev) => ({
-                              ...prev,
-                              [log.id]: e.target.value,
-                            }))
-                          }
-                          placeholder="Enter your feedback..."
-                          className={styles.feedbackInput}
-                        />
-                      )}
-                    </div>
-                  </td>
-                  <td>
-                    <div className={styles.actionButtons}>
-                      {log.status === "SUBMITTED" ? (
-                        <>
-                          <button
-                            type="button"
-                            className={`${styles.actionBtn} ${styles.viewBtn}`}
-                            onClick={() => openLogModal(log)}
-                            title="View full log details"
-                          >
-                            View & Authorize
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <button
-                            type="button"
-                            className={`${styles.actionBtn} ${styles.viewBtn}`}
-                            onClick={() => openLogModal(log)}
-                            title="View log details"
-                          >
-                            View Details
-                          </button>
-                          <span className={styles.statusBadge}>
-                            {log.status}
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+        </div>
+      )}
 
       {/* Log Details Modal */}
       {showModal && selectedLog && (
