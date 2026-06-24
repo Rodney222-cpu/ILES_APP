@@ -1,9 +1,9 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Navbar from "../components/Navbar";
-import SummaryCard from "../components/SummaryCard";
-import LogsTable from "../components/LogsTable";
+import Navbar from "../components/navbar";
+import SummaryCard from "../components/summarycard";
+import LogsTable from "../components/logtable";
 
 
 const StudentDashboard = () => {
@@ -12,7 +12,7 @@ const StudentDashboard = () => {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     fetchStudentData();
-    fetchLogs();
+    fetchLogs(); 
   }, []); 
   const fetchStudentData = async () => {
     try {
